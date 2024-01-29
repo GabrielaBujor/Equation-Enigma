@@ -42,16 +42,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Skip"
-                android:background="?attr/selectableItemBackground"
-                android:textColor="@color/material_dynamic_primary10"/>
+                android:background="@drawable/rounded_button"
+                android:textColor="@color/black"/>
 
             <Button
                 android:id="@+id/button_next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Next"
-                android:background="?attr/selectableItemBackground"
-                android:textColor="@color/material_dynamic_primary10"/>
+                android:background="@drawable/rounded_button"
+                android:textColor="@color/black"/>
         </LinearLayout>
 
     </LinearLayout>
