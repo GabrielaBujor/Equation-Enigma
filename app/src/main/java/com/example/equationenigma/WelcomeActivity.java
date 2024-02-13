@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.View;
-import android.webkit.WebBackForwardList;
 import android.widget.Button;
 
 import java.util.Arrays;
@@ -32,7 +31,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 new Pair<>(R.drawable.graphs, "You will learn how to draw graphs"),
                 new Pair<>(R.drawable.plotting, "Using Geogebra, you will learn how to plot the graph of different functions"),
                 new Pair<>(R.drawable.quiz, "You will have some short quizzes"),
-                new Pair<>(R.drawable.quote, "Keep it up")
+                new Pair<>(R.drawable.quote, "Keep it up and don't give up! You can do this")
         );
 
         WelcomePagerAdapter adapter = new WelcomePagerAdapter(this, pagesData);
@@ -47,7 +46,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 if(current < total - 1) {
                     viewPager2.setCurrentItem(current + 1, true);
                 } else {
-                    Intent intent = new Intent(WelcomeActivity.this, LoginActivity.class);
+                    Intent intent = new Intent(WelcomeActivity.this, LogIn.class);
                     startActivity(intent);
 
                     finish();
@@ -63,7 +62,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 editor.putBoolean("welcomeShown", true);
                 editor.apply();
 
-                Intent intent = new Intent(WelcomeActivity.this, LoginActivity.class);
+                Intent intent = new Intent(WelcomeActivity.this, LogIn.class);
                 startActivity(intent);
 
                 finish();
