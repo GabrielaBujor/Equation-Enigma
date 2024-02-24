@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -110,11 +111,12 @@ public class SignUp extends AppCompatActivity {
                                                        Toast.makeText(SignUp.this, "Failed to create user profile.", Toast.LENGTH_LONG).show();
                                                    }
                                                }
-                                           });
-                                        .addOnFailureListener(new OnFailureListener() {
+                                           })
+                                            .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-
+                                                Toast.makeText(SignUp.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                                Log.e("SignUpError", "Failed to create user profile", e);
                                             }
                                         });
                                } else {
@@ -125,6 +127,7 @@ public class SignUp extends AppCompatActivity {
            }
         });
     }
+
 
     public static class User {
         public String fullName;
