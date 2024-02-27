@@ -20,8 +20,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class SignUp extends AppCompatActivity {
 
@@ -53,6 +57,8 @@ public class SignUp extends AppCompatActivity {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference usersRef = database.getReference("Users");
+
+
 
         buttonSignUp.setOnClickListener(new View.OnClickListener() {
            @Override
@@ -87,6 +93,7 @@ public class SignUp extends AppCompatActivity {
                    return;
                }
 
+
                mAuth.createUserWithEmailAndPassword(email, password)
                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                            @Override
@@ -120,7 +127,11 @@ public class SignUp extends AppCompatActivity {
                                             }
                                         });
                                } else {
-                                   Toast.makeText(SignUp.this, "Failed to sign up: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                   if(task.getException() instanceof FirebaseAuthUserCollisionException) {
+                                       Toast.makeText(SignUp.this, "User with this email already exists.", Toast.LENGTH_LONG).show();
+                                   } else {
+                                       Toast.makeText(SignUp.this, "Failed to sign up: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                   }
                                }
                            }
                        });

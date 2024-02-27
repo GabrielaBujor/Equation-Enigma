@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1056576648443",
+    "firebase_url": "https://equation-enigma-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "equation-enigma",
+    "storage_bucket": "equation-enigma.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1056576648443:android:82046c07598f7ed48cac5e",
+        "android_client_info": {
+          "package_name": "com.example.equationenigma"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACLw5xRuP5sTYUve-fMsMWNMHiG48H-es"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
