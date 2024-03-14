@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,8 +19,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
-public class LogIn extends AppCompatActivity {
+import java.util.regex.Pattern;
+
+public class LogInActivity extends AppCompatActivity {
 
     private EditText emailEditText;
     private EditText passwordEditText;
@@ -52,14 +58,14 @@ public class LogIn extends AppCompatActivity {
                 String email = emailEditText.getText().toString().trim();
                 String password = passwordEditText.getText().toString().trim();
 
-                if(email.isEmpty()) {
-                    emailEditText.setError("Email is required");
+                if(!validateEmail(email)) {
+                    emailEditText.setError("Invalid email format");
                     emailEditText.requestFocus();
                     return;
                 }
 
-                if(password.isEmpty()) {
-                    passwordEditText.setError("Password is required");
+                if(password.isEmpty() || !validatePassword(password)) {
+                    passwordEditText.setError("Invalid password");
                     passwordEditText.requestFocus();
                     return;
                 }
@@ -70,7 +76,7 @@ public class LogIn extends AppCompatActivity {
 
             private void loginUser(String email, String password) {
                 mAuth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(LogIn.this, new OnCompleteListener<AuthResult>() {
+                        .addOnCompleteListener(LogInActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if(task.isSuccessful()) {
@@ -87,20 +93,40 @@ public class LogIn extends AppCompatActivity {
                                     }
                                     startMainActivity();
                                     } else {
-                                    Log.w("Login", "signInWithEmail:failure", task.getException());
-                                    Toast.makeText(LogIn.this, "Login", Toast.LENGTH_SHORT).show();
+                                        if(task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                                            Toast.makeText(LogInActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
+                                        } else if (task.getException() instanceof FirebaseAuthInvalidUserException) {
+                                            Toast.makeText(LogInActivity.this, "User does not exist", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            //Log.w("Login", "signInWithEmail:failure", task.getException());
+                                            Toast.makeText(LogInActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
+
+                                        }
+
+
                                 }
                             }
                         });
             }
+
+            private boolean validateEmail(String email) {
+                return !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();
+            }
+
+            private boolean validatePassword(String password) {
+                Pattern pattern = Pattern.compile("^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,}$");
+                return pattern.matcher(password).matches();
+            }
         });
+
+
 
 
 
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
            public void onClick(View v) {
-                Intent intent = new Intent(LogIn.this, SignUp.class);
+                Intent intent = new Intent(LogInActivity.this, SignUpActivity.class);
                 startActivity(intent);
             }
         });
@@ -111,7 +137,7 @@ public class LogIn extends AppCompatActivity {
     }
 
     private void startMainActivity() {
-        Intent intent = new Intent(LogIn.this, MainActivity.class);
+        Intent intent = new Intent(LogInActivity.this, MainActivity.class);
         startActivity(intent);
 
         finish();

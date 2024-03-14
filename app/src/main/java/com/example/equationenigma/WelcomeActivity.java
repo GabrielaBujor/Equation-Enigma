@@ -46,7 +46,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 if(current < total - 1) {
                     viewPager2.setCurrentItem(current + 1, true);
                 } else {
-                    Intent intent = new Intent(WelcomeActivity.this, LogIn.class);
+                    Intent intent = new Intent(WelcomeActivity.this, LogInActivity.class);
                     startActivity(intent);
 
                     finish();
@@ -62,7 +62,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 editor.putBoolean("welcomeShown", true);
                 editor.apply();
 
-                Intent intent = new Intent(WelcomeActivity.this, LogIn.class);
+                Intent intent = new Intent(WelcomeActivity.this, LogInActivity.class);
                 startActivity(intent);
 
                 finish();
