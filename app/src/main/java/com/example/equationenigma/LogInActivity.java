@@ -46,7 +46,7 @@ public class LogInActivity extends AppCompatActivity {
         signUpButton = findViewById(R.id.sign_up_button);
         rememberMeCheckBox = findViewById(R.id.checkbox_remember_me);
 
-        SharedPreferences prefs = getSharedPreferences("LoginPrefs", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS_FILE, MODE_PRIVATE);
         boolean isRemembered = prefs.getBoolean("Remember Me", false);
         if(isRemembered) {
             startMainActivity();
@@ -118,9 +118,6 @@ public class LogInActivity extends AppCompatActivity {
                 return pattern.matcher(password).matches();
             }
         });
-
-
-
 
 
         signUpButton.setOnClickListener(new View.OnClickListener() {
