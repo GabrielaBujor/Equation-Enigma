@@ -1,17 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fillViewport="true"
     tools:context=".UserProfileFragment"
     android:background="@drawable/background">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="User profile"
-        android:gravity="center"
-        android:textSize="30dp"
-        android:textColor="@color/black"/>
 
-</FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User Profile"
+            android:textSize="30dp"
+            android:textColor="@color/black"
+            android:layout_marginTop="10dp"/>
+
+        <!-- Profile Image -->
+        <ImageView
+            android:id="@+id/profile_picture"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/baseline_person_24"
+            android:scaleType="centerCrop"
+            android:padding="8dp"
+            android:layout_marginBottom="35dp"
+            android:layout_marginTop="40dp"/>
+
+        <!-- Full Name Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Full Name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+            <TextView
+                android:id="@+id/text_full_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="Actual name"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:gravity="end"/>
+        </LinearLayout>
+
+        <!-- Email Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="E-mail"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+            <TextView
+                android:id="@+id/text_email"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="Actual email"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:gravity="end"/>
+        </LinearLayout>
+
+<!--        &lt;!&ndash; Badges RecyclerView &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Badges"-->
+<!--            android:textAppearance="@style/TextAppearance.AppCompat.Medium"-->
+<!--            android:layout_marginTop="24dp"/>-->
+
+<!--        <androidx.recyclerview.widget.RecyclerView-->
+<!--            android:id="@+id/badges_recycler_view"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:orientation="horizontal"-->
+<!--            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"-->
+<!--            tools:listitem="@layout/item_badge" />-->
+
+        <!-- Edit Profile Button -->
+        <Button
+            android:id="@+id/button_edit_profile"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Edit Profile"
+            android:background="@drawable/rounded_button"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="90dp"/>
+
+        <!-- Logout Button -->
+        <Button
+            android:id="@+id/button_logout"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Logout"
+            android:background="@drawable/rounded_button"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Delete Account Button -->
+        <Button
+            android:id="@+id/button_delete_account"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Delete Account"
+            android:textColor="@color/white"
+            android:background="@drawable/delete_button" />
+    </LinearLayout>
+</ScrollView>
