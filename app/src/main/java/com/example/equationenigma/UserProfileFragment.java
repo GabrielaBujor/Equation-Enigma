@@ -1,5 +1,6 @@
 package com.example.equationenigma;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 public class UserProfileFragment extends Fragment {
 
@@ -33,6 +35,8 @@ public class UserProfileFragment extends Fragment {
     private Button buttonEditProfile, buttonLogout, buttonDeleteAccount;
 
     private ValueEventListener userDataListener;
+
+    private static final int EDIT_PROFILE_REQUEST_CODE = 1;
 
 
 
@@ -74,12 +78,7 @@ public class UserProfileFragment extends Fragment {
     }
 
     private void setUpButtonListeners() {
-        buttonEditProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                editProfile();
-            }
-        });
+        buttonEditProfile.setOnClickListener(v -> editProfile());
 
         buttonLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,8 +109,41 @@ public class UserProfileFragment extends Fragment {
 
 
     private void editProfile() {
-
+        Intent intent = new Intent(getActivity(), EditProfileActivity.class);
+        startActivityForResult(intent, EDIT_PROFILE_REQUEST_CODE);
     }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == EDIT_PROFILE_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            String updatedName = data.getStringExtra("USER_NAME");
+            String updatedImageUri = data.getStringExtra("PROFILE_IMAGE_URI");
+            updateUIAfterProfileUpdate(updatedName, updatedImageUri);
+        }
+    }
+
+
+    private void updateUIAfterProfileUpdate(String updatedName, String updatedImageUrl) {
+        // Assuming you have a TextView in your fragment for the user's name
+        TextView userNameTextView = getView().findViewById(R.id.text_full_name);
+        userNameTextView.setText(updatedName);
+
+        // Assuming you have an ImageView in your fragment for the user's profile picture
+        ImageView profileImageView = getView().findViewById(R.id.profile_picture);
+
+        // Update the ImageView with the new image
+        if (updatedImageUrl != null && !updatedImageUrl.isEmpty()) {
+            // Using Picasso to load the image. You can use Glide or another library similarly.
+            Picasso.get().load(updatedImageUrl).into(profileImageView);
+        } else {
+            // Set a default image or placeholder
+            profileImageView.setImageResource(R.drawable.baseline_person_24); // Replace with your default image resource
+        }
+    }
+
 
     private void logout() {
         clearUserSession();
