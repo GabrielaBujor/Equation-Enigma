@@ -1,9 +1,13 @@
 package com.example.equationenigma;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -67,15 +72,27 @@ public class UserProfileFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Log the error or show an error message to the user
-                Log.e("UserProfileFragment", "Database error: " + databaseError.toException());
-                // You can also use a Toast to notify the user
-                Toast.makeText(getActivity(), "Failed to load data.", Toast.LENGTH_SHORT).show();
+                if(databaseError.toException() instanceof FirebaseNetworkException) {
+                    Toast.makeText(getActivity(), "Check your internet connection and try again", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Log the error or show an error message to the user
+                    Log.e("UserProfileFragment", "Database error: " + databaseError.toException());
+                    // You can also use a Toast to notify the user
+                    Toast.makeText(getActivity(), "Failed to load data.", Toast.LENGTH_SHORT).show();
+                }
+
             }
         };
 
         return view;
     }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
 
     private void setUpButtonListeners() {
         buttonEditProfile.setOnClickListener(v -> editProfile());
@@ -115,23 +132,21 @@ public class UserProfileFragment extends Fragment {
 
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == EDIT_PROFILE_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+        if (requestCode == EDIT_PROFILE_REQUEST_CODE && resultCode == RESULT_OK) {
             String updatedName = data.getStringExtra("USER_NAME");
-            String updatedImageUri = data.getStringExtra("PROFILE_IMAGE_URI");
-            updateUIAfterProfileUpdate(updatedName, updatedImageUri);
+            String updatedImageUrl = data.getStringExtra("PROFILE_IMAGE_URI");
+            updateUIAfterProfileUpdate(updatedName, updatedImageUrl);
         }
     }
+
 
 
     private void updateUIAfterProfileUpdate(String updatedName, String updatedImageUrl) {
         // Assuming you have a TextView in your fragment for the user's name
         TextView userNameTextView = getView().findViewById(R.id.text_full_name);
         userNameTextView.setText(updatedName);
-
-        // Assuming you have an ImageView in your fragment for the user's profile picture
         ImageView profileImageView = getView().findViewById(R.id.profile_picture);
 
         // Update the ImageView with the new image

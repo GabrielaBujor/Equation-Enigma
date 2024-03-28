@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.Nullable;
 
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private ImageView imageViewProfile;
     private Uri imageUri;
     private StorageReference storageRef;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +63,20 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void saveChanges() {
         String name = editTextName.getText().toString().trim();
-        // TODO: Validate name and handle imageUri (upload to Firebase and get URL)
+        if(name.isEmpty()) {
+            showToastMessage("Name cannot be empty");
+            return;
+        }
+
+        if(imageUri != null) {
+            uploadImageToFirebase(name, imageUri);
+        } else {
+            updateFirebaseAuthProfile(name, null);
+            updateUserInRealtimeDatabase(FirebaseAuth.getInstance().getCurrentUser().getUid(), name, null);
+        }
 
 
-        uploadImageToFirebase(imageUri);
+
 
         // Prepare result intent
         Intent resultIntent = new Intent();
@@ -74,40 +86,52 @@ public class EditProfileActivity extends AppCompatActivity {
         finish();
     }
 
-    private void uploadImageToFirebase(Uri imageUri) {
-        if (imageUri != null) {
+    private void uploadImageToFirebase(String name, Uri imageUri) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Uploading");
+            progressDialog.setMessage("Please wait while we upload your profile picture");
+            progressDialog.show();
             StorageReference fileRef = storageRef.child("profile_pics/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + ".jpg");
 
             fileRef.putFile(imageUri)
                     .addOnSuccessListener(taskSnapshot -> {
                         fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                            progressDialog.dismiss();
                             String imageUrl = uri.toString();
                             // Handle the URL (e.g., store in user's profile, update UI)
-                            updateFirebaseAuthProfile(editTextName.getText().toString().trim(), imageUrl);
-                            updateUserInRealtimeDatabase(FirebaseAuth.getInstance().getCurrentUser().getUid(), editTextName.getText().toString().trim(), imageUrl);
+                            updateFirebaseAuthProfile(name, imageUrl);
+                            updateUserInRealtimeDatabase(FirebaseAuth.getInstance().getCurrentUser().getUid(), name, imageUrl);
                         });
                     })
                     .addOnFailureListener(e -> {
                         // Handle unsuccessful uploads
-                        Toast.makeText(EditProfileActivity.this, "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                        showToastMessage("Upload failed: " + e.getMessage());
                     });
-        }
     }
 
-    private void updateFirebaseAuthProfile(String name, String imageUrl) {
+    private void updateFirebaseAuthProfile(String name, @Nullable String imageUrl) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                    .setDisplayName(name)
-                    .setPhotoUri(Uri.parse(imageUrl)) // imageUrl should be a String URL
-                    .build();
+            UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder()
+                    .setDisplayName(name);
+
+            if (imageUrl != null) {
+                builder.setPhotoUri(Uri.parse(imageUrl));
+            }
+
+            UserProfileChangeRequest profileUpdates = builder.build();
 
             user.updateProfile(profileUpdates)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             Log.d("UserProfileUpdate", "User profile updated.");
-                            // Optionally, you can update your app's UI or database here.
-                            updateUIAfterProfileUpdate(name, imageUrl);
+                            // Prepare and set the result for the activity
+                            Intent resultIntent = new Intent();
+                            resultIntent.putExtra("USER_NAME", name);
+                            resultIntent.putExtra("PROFILE_IMAGE_URI", imageUrl);
+                            setResult(RESULT_OK, resultIntent);
+                            finish();
                         } else {
                             // Handle the error
                             Log.e("UserProfileUpdate", "Error updating profile", task.getException());
@@ -115,15 +139,6 @@ public class EditProfileActivity extends AppCompatActivity {
                         }
                     });
         }
-    }
-
-    private void updateUIAfterProfileUpdate(String name, String imageUrl) {
-        // Update UI elements with the new name and image URL
-        // For example:
-        // textViewUserName.setText(name);
-        // if(imageUrl != null && !imageUrl.isEmpty()) {
-        //     Picasso.get().load(imageUrl).into(imageViewUserProfile);
-        // }
     }
 
 
