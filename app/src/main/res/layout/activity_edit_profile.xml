@@ -8,12 +8,21 @@
     android:background="@drawable/background"
     android:gravity="center_horizontal">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit profile"
+        android:textSize="30dp"
+        android:textColor="@color/black"
+        android:layout_marginTop="10dp"/>
+
     <EditText
         android:id="@+id/editTextName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter name"
+        android:hint="Enter new name"
         android:inputType="textPersonName"
+        android:layout_marginTop="50dp"
         android:minHeight="48dp" />
 
     <ImageView
@@ -21,22 +30,22 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="60dp"
         android:src="@drawable/baseline_person_24" />
 
     <Button
         android:id="@+id/buttonChooseImage"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="110dp"
-        android:text="Choose Image"
+        android:layout_marginTop="120dp"
+        android:text="Choose new Image"
         android:background="@drawable/rounded_button"/>
 
     <Button
         android:id="@+id/buttonSave"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:text="Save Changes"
         android:background="@drawable/rounded_button"/>
 
