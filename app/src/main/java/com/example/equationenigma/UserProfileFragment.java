@@ -210,7 +210,7 @@ public class UserProfileFragment extends Fragment {
             Picasso.get().load(updatedImageUrl).into(profileImageView);
         } else {
             // Set a default image or placeholder
-            profileImageView.setImageResource(R.drawable.baseline_person_24); // Replace with your default image resource
+            profileImageView.setImageResource(R.drawable.baseline_person_24);
         }
     }
 
