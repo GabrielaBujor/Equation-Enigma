@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 
+import com.example.equationenigma.Exercises.Chapter;
+import com.example.equationenigma.Exercises.Exercise;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

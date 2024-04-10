@@ -7,6 +7,10 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
+import com.example.equationenigma.Exercises.Chapter;
+import com.example.equationenigma.Exercises.Exercise;
+import com.example.equationenigma.Exercises.SolvedExercise;
+
 import java.util.HashMap;
 import java.util.List;
 

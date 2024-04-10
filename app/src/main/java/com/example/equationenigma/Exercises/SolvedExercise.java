@@ -1,6 +1,6 @@
-package com.example.equationenigma;
+package com.example.equationenigma.Exercises;
 
-public class SolvedExercise extends Exercise{
+public class SolvedExercise extends Exercise {
     private String solution;
 
     // Constructor, getters, and setters

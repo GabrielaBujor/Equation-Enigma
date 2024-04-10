@@ -1,4 +1,4 @@
-package com.example.equationenigma;
+package com.example.equationenigma.Exercises;
 
 public class Exercise {
     private String title;

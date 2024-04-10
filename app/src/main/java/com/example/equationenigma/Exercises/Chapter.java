@@ -1,4 +1,4 @@
-package com.example.equationenigma;
+package com.example.equationenigma.Exercises;
 
 import java.util.List;
 
