@@ -3,6 +3,7 @@ package com.example.equationenigma;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,8 @@ import android.widget.ExpandableListView;
 
 import com.example.equationenigma.Exercises.Chapter;
 import com.example.equationenigma.Exercises.Exercise;
+import com.example.equationenigma.Power.PSolvedEx1;
+import com.example.equationenigma.Power.PSolvedEx2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,40 +22,118 @@ import java.util.List;
 
 
 public class HomeFragment extends Fragment {
-    private ExpandableListView expandableListView;
-    ExpandableListAdapter expandableListAdapter;
-    List<Chapter> chapterList;
-    HashMap<Chapter, List<Exercise>> exerciseListMap;
-    private CustomExpandableListAdapter adapter;
+    ExpandableListView expandableListView;
+    ChaptersExpandableListAdapter listAdapter;
+    List<String> listDataHeader;
+    HashMap<String, List<String>> listDataChild;
+    private HashMap<String, Class<? extends Fragment>> fragmentMap;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-        expandableListView = view.findViewById(R.id.chaptersExpandableListView);
+        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        // Initialize chapterList and exerciseListMap with data
-        chapterList = new ArrayList<>();
-        exerciseListMap = new HashMap<>();
+        // get the listview
+        expandableListView = rootView.findViewById(R.id.fragment_container);
 
-        expandableListView = view.findViewById(R.id.chaptersExpandableListView);
-        chapterList = new ArrayList<>();
-        exerciseListMap = new HashMap<>();
+        // preparing list data
+        prepareListData();
+        prepareFragmentMap();
 
-        // Fetch chapters and exercises from Firebase
-        fetchChapters();
+        listAdapter = new ChaptersExpandableListAdapter(getActivity(), listDataHeader, listDataChild);
 
-        // Set up the adapter with the data
-        adapter = new CustomExpandableListAdapter(getContext(), chapterList, exerciseListMap);
-        expandableListView.setAdapter(adapter);
+        // setting list adapter
+        expandableListView.setAdapter(listAdapter);
 
-        // Load your chapters and exercises here or in another method
+        // Listview Group click listener
+        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v,
+                                        int groupPosition, int childPosition, long id) {
+                String selectedItem = (String) listAdapter.getChild(groupPosition, childPosition);
+                // Use the createInstance() method instead of newInstance()
+                Fragment fragment;
+                switch (selectedItem) {
+                    case "Solved ex 1":
+                        fragment = PSolvedEx1.createInstance();
+                        break;
+                    case "Solved ex 2":
+                        fragment = PSolvedEx2.createInstance();
+                        break;
+                    // Add cases for other fragments
+                    default:
+                        fragment = null; // or handle it with a default case
+                        break;
+                }
 
-        return view;
+                // Make sure you don't attempt to navigate with a null fragment
+                if (fragment != null) {
+                    navigateToFragment(fragment);
+                } else {
+                    // Handle the null fragment case (show error message or log)
+                }
+                return true;
+            }
+        });
+
+        return rootView;
     }
 
-    private void fetchChapters() {
-        // Firebase query to fetch chapter and exercises
-        // Update chapterList and exerciseListMap accordingly
+    private void navigateToFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getParentFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.frame_layout, fragment) // The ID of your FrameLayout or FragmentContainerView
+                .addToBackStack(null)
+                .commit();
     }
+
+    private void prepareFragmentMap() {
+        fragmentMap = new HashMap<>();
+        fragmentMap.put("Solved ex 1", PSolvedEx1.class);
+        fragmentMap.put("Solved ex 2", PSolvedEx2.class);
+        // add mappings for other exercise fragments
+    }
+
+    /*
+     * Preparing the list data
+     */
+    private void prepareListData() {
+        listDataHeader = new ArrayList<String>();
+        listDataChild = new HashMap<>();
+
+        // Adding child data
+        listDataHeader.add("Power");
+        listDataHeader.add("Roots");
+        listDataHeader.add("Exponential");
+        listDataHeader.add("Logarithmic");
+
+
+        // Adding child data for the chapters
+        List<String> powerExercises = new ArrayList<>();
+        powerExercises.add("Solved ex 1");
+        powerExercises.add("Solved ex 2");
+        powerExercises.add("Exercise 1");
+        powerExercises.add("Exercise 2");
+        powerExercises.add("Exercise 3");
+
+        List<String> rootsExercises = new ArrayList<>();
+        rootsExercises.add("Solved ex 1");
+        rootsExercises.add("Solved ex 2");
+        rootsExercises.add("Exercise 1");
+        rootsExercises.add("Exercise 2");
+        rootsExercises.add("Exercise 3");
+
+        listDataChild.put("Power", powerExercises); // Header, Child data
+        listDataChild.put("Roots", rootsExercises);
+
+
+
+
+
+
+    }
+
+
+
 }

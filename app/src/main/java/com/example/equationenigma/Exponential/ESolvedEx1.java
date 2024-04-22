@@ -1,4 +1,4 @@
-package com.example.equationenigma.Power;
+package com.example.equationenigma.Exponential;
 
 import android.os.Bundle;
 
@@ -19,7 +19,8 @@ import com.example.equationenigma.R;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
-public class PSolvedEx2 extends Fragment {
+
+public class ESolvedEx1 extends Fragment {
 
     private TextView textViewTitle;
     private TextView textViewFunction;
@@ -34,21 +35,16 @@ public class PSolvedEx2 extends Fragment {
     private ImageView imageViewGraph;
     private Button HomeButton;
 
-    public PSolvedEx2() {
+    public ESolvedEx1() {
         // Required empty public constructor
     }
 
-    public static PSolvedEx2 createInstance() {
-        PSolvedEx2 fragment = new PSolvedEx2();
-        // Do any initial setup or pass arguments here if needed
-        return fragment;
-    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_p_solved_ex2, container, false);
+        View view = inflater.inflate(R.layout.fragment_e_solved_ex1, container, false);
 
         textViewTitle = view.findViewById(R.id.textViewTitle);
         textViewFunction = view.findViewById(R.id.textViewFunction);
@@ -80,7 +76,7 @@ public class PSolvedEx2 extends Fragment {
 
     private void fetchExerciseData() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Exercises").document("PSolvedEx2")
+        db.collection("Exercises").document("ESolvedEx1")
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {

@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep all public classes that extend androidx.fragment.app.Fragment and their public constructors.
+-keep public class * extends androidx.fragment.app.Fragment {
+    public <init>();
+}

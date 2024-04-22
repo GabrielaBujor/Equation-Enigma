@@ -41,6 +41,12 @@ public class PSolvedEx1 extends Fragment {
         // Required empty public constructor
     }
 
+    public static PSolvedEx1 createInstance() {
+        PSolvedEx1 fragment = new PSolvedEx1();
+        // Do any initial setup or pass arguments here if needed
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -64,17 +70,14 @@ public class PSolvedEx1 extends Fragment {
         // Fetch the document from Firestore
         fetchExerciseData();
 
-//        HomeButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // Replace 'PSolvedEx1Fragment.this' with 'getActivity()' if you're calling from within an inner class
-//                FragmentManager fragmentManager = PSolvedEx1.this.getParentFragmentManager();
-//                fragmentManager.beginTransaction()
-//                        .replace(R.id., new HomeFragment())
-//                        .addToBackStack(null) // Optional, if you want to add the transaction to the back stack
-//                        .commit();
-//            }
-//        });
+        HomeButton.setOnClickListener(v -> {
+            // Replace 'PSolvedEx1.this' with 'getActivity()' if you're calling from within an inner class
+            FragmentManager fragmentManager = getParentFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, new HomeFragment()) // 'R.id.fragment_container' is the container ID from the main activity's layout.
+                    .addToBackStack(null) // Optional, if you want to add the transaction to the back stack.
+                    .commit();
+        });
 
         return view;
     }
