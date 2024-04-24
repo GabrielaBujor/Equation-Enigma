@@ -57,8 +57,8 @@ public class UserProfileFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
         profilePicture = view.findViewById(R.id.profile_picture);
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
+//        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+//        setSupportActionBar(myToolbar);
 
         textFullName = view.findViewById(R.id.text_full_name);
         textEmail = view.findViewById(R.id.text_email);

@@ -46,7 +46,6 @@ public class LSolvedEx2 extends Fragment {
     }
 
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -119,3 +118,4 @@ public class LSolvedEx2 extends Fragment {
                     // For example, hiding the loading indicator or showing an error message directly in the UI
                 });
     }
+}

@@ -81,9 +81,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void navigateToFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getParentFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.frame_layout, fragment) // The ID of your FrameLayout or FragmentContainerView
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null)
                 .commit();
     }
@@ -124,9 +123,24 @@ public class HomeFragment extends Fragment {
         rootsExercises.add("Exercise 2");
         rootsExercises.add("Exercise 3");
 
+        List<String> logarithmicExercises = new ArrayList<>();
+        logarithmicExercises.add("Solved ex 1");
+        logarithmicExercises.add("Solved ex 2");
+        logarithmicExercises.add("Exercise 1");
+        logarithmicExercises.add("Exercise 2");
+        logarithmicExercises.add("Exercise 3");
+
+        List<String> exponentialExercises = new ArrayList<>();
+        exponentialExercises.add("Solved ex 1");
+        exponentialExercises.add("Solved ex 2");
+        exponentialExercises.add("Exercise 1");
+        exponentialExercises.add("Exercise 2");
+        exponentialExercises.add("Exercise 3");
+
         listDataChild.put("Power", powerExercises); // Header, Child data
         listDataChild.put("Roots", rootsExercises);
-
+        listDataChild.put("Logarithmic", logarithmicExercises);
+        listDataChild.put("Exponential", exponentialExercises);
 
 
 

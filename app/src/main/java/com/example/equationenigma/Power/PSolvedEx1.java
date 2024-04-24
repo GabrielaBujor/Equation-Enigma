@@ -71,7 +71,6 @@ public class PSolvedEx1 extends Fragment {
         fetchExerciseData();
 
         HomeButton.setOnClickListener(v -> {
-            // Replace 'PSolvedEx1.this' with 'getActivity()' if you're calling from within an inner class
             FragmentManager fragmentManager = getParentFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, new HomeFragment()) // 'R.id.fragment_container' is the container ID from the main activity's layout.
