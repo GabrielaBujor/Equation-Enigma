@@ -70,7 +70,7 @@ public class LSolvedEx1 extends Fragment {
         HomeButton.setOnClickListener(v -> {
             FragmentManager fragmentManager = getParentFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, new HomeFragment()) // 'R.id.fragment_container' is the container ID from the main activity's layout.
+                    .replace(R.id.frame_layout, new HomeFragment()) // 'R.id.fragment_container' is the container ID from the main activity's layout.
                     .addToBackStack(null) // Optional, if you want to add the transaction to the back stack.
                     .commit();
         });

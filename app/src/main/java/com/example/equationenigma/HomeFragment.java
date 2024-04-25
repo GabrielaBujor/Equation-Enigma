@@ -13,8 +13,26 @@ import android.widget.ExpandableListView;
 
 import com.example.equationenigma.Exercises.Chapter;
 import com.example.equationenigma.Exercises.Exercise;
+import com.example.equationenigma.Exponential.EEx1;
+import com.example.equationenigma.Exponential.EEx2;
+import com.example.equationenigma.Exponential.EEx3;
+import com.example.equationenigma.Exponential.ESolvedEx1;
+import com.example.equationenigma.Exponential.ESolvedEx2;
+import com.example.equationenigma.Logarithmic.LEx1;
+import com.example.equationenigma.Logarithmic.LEx2;
+import com.example.equationenigma.Logarithmic.LEx3;
+import com.example.equationenigma.Logarithmic.LSolvedEx1;
+import com.example.equationenigma.Logarithmic.LSolvedEx2;
+import com.example.equationenigma.Power.PEx1;
+import com.example.equationenigma.Power.PEx2;
+import com.example.equationenigma.Power.PEx3;
 import com.example.equationenigma.Power.PSolvedEx1;
 import com.example.equationenigma.Power.PSolvedEx2;
+import com.example.equationenigma.Roots.REx1;
+import com.example.equationenigma.Roots.REx2;
+import com.example.equationenigma.Roots.REx3;
+import com.example.equationenigma.Roots.RSolvedEx1;
+import com.example.equationenigma.Roots.RSolvedEx2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +44,7 @@ public class HomeFragment extends Fragment {
     ChaptersExpandableListAdapter listAdapter;
     List<String> listDataHeader;
     HashMap<String, List<String>> listDataChild;
-    private HashMap<String, Class<? extends Fragment>> fragmentMap;
+    private HashMap<ChapterExerciseKey, Class<? extends Fragment>> fragmentMap;
 
 
     @Override
@@ -49,50 +67,60 @@ public class HomeFragment extends Fragment {
         // Listview Group click listener
         expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public boolean onChildClick(ExpandableListView parent, View v,
-                                        int groupPosition, int childPosition, long id) {
-                String selectedItem = (String) listAdapter.getChild(groupPosition, childPosition);
-                // Use the createInstance() method instead of newInstance()
-                Fragment fragment;
-                switch (selectedItem) {
-                    case "Solved ex 1":
-                        fragment = PSolvedEx1.createInstance();
-                        break;
-                    case "Solved ex 2":
-                        fragment = PSolvedEx2.createInstance();
-                        break;
-                    // Add cases for other fragments
-                    default:
-                        fragment = null; // or handle it with a default case
-                        break;
-                }
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                String chapter = (String) listAdapter.getGroup(groupPosition);
+                String exercise = (String) listAdapter.getChild(groupPosition, childPosition);
+                ChapterExerciseKey key = new ChapterExerciseKey(chapter, exercise);
+                Class<? extends Fragment> fragmentClass = fragmentMap.get(key);
 
-                // Make sure you don't attempt to navigate with a null fragment
-                if (fragment != null) {
-                    navigateToFragment(fragment);
-                } else {
-                    // Handle the null fragment case (show error message or log)
+                if (fragmentClass != null) {
+                    try {
+                        Fragment fragmentInstance = (Fragment) fragmentClass.getMethod("createInstance").invoke(null);
+                        navigateToFragment(fragmentInstance);
+                    } catch (Exception e) { // Handle all the reflection related exceptions
+                        e.printStackTrace();
+                    }
                 }
                 return true;
             }
         });
+
 
         return rootView;
     }
 
     private void navigateToFragment(Fragment fragment) {
         getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, fragment)
+                .replace(R.id.frame_layout, fragment)
                 .addToBackStack(null)
                 .commit();
     }
 
     private void prepareFragmentMap() {
         fragmentMap = new HashMap<>();
-        fragmentMap.put("Solved ex 1", PSolvedEx1.class);
-        fragmentMap.put("Solved ex 2", PSolvedEx2.class);
-        // add mappings for other exercise fragments
+        // Use chapter and exercise names to create  unique keys
+        fragmentMap.put(new ChapterExerciseKey("Power", "Solved ex 1"), PSolvedEx1.class);
+        fragmentMap.put(new ChapterExerciseKey("Power", "Solved ex 2"), PSolvedEx2.class);
+        fragmentMap.put(new ChapterExerciseKey("Power", "Exercise 1"), PEx1.class);
+        fragmentMap.put(new ChapterExerciseKey("Power", "Exercise 2"), PEx2.class);
+        fragmentMap.put(new ChapterExerciseKey("Power", "Exercise 3"), PEx3.class);
+        fragmentMap.put(new ChapterExerciseKey("Roots", "Solved ex 1"), RSolvedEx1.class);
+        fragmentMap.put(new ChapterExerciseKey("Roots", "Solved ex 2"), RSolvedEx2.class);
+        fragmentMap.put(new ChapterExerciseKey("Roots", "Exercise 1"), REx1.class);
+        fragmentMap.put(new ChapterExerciseKey("Roots", "Exercise 2"), REx2.class);
+        fragmentMap.put(new ChapterExerciseKey("Roots", "Exercise 3"), REx3.class);
+        fragmentMap.put(new ChapterExerciseKey("Exponential", "Solved ex 1"), ESolvedEx1.class);
+        fragmentMap.put(new ChapterExerciseKey("Exponential", "Solved ex 2"), ESolvedEx2.class);
+        fragmentMap.put(new ChapterExerciseKey("Exponential", "Exercise 1"), EEx1.class);
+        fragmentMap.put(new ChapterExerciseKey("Exponential", "Exercise 2"), EEx2.class);
+        fragmentMap.put(new ChapterExerciseKey("Exponential", "Exercise 3"), EEx3.class);
+        fragmentMap.put(new ChapterExerciseKey("Logarithmic", "Solved ex 1"), LSolvedEx1.class);
+        fragmentMap.put(new ChapterExerciseKey("Logarithmic", "Solved ex 2"), LSolvedEx2.class);
+        fragmentMap.put(new ChapterExerciseKey("Logarithmic", "Exercise 1"), LEx1.class);
+        fragmentMap.put(new ChapterExerciseKey("Logarithmic", "Exercise 2"), LEx2.class);
+        fragmentMap.put(new ChapterExerciseKey("Logarithmic", "Exercise 3"), LEx3.class);
     }
+
 
     /*
      * Preparing the list data
