@@ -1,7 +1,9 @@
 package com.example.equationenigma.Power;
 
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -16,7 +18,11 @@ import android.widget.Toast;
 
 import com.example.equationenigma.HomeFragment;
 import com.example.equationenigma.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 public class PSolvedEx2 extends Fragment {
@@ -78,6 +84,34 @@ public class PSolvedEx2 extends Fragment {
         return view;
     }
 
+    private void fetchAndDisplayImage(ImageView imageView, String path) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        // Check if the path is a full 'gs://' URL or just a filename
+        if (!path.startsWith("gs://")) {
+            // Assume the file is stored at the root of the Firebase Storage bucket
+            path = "gs://equation-enigma.appspot.com/" + path;
+        }
+        Log.d("FirebaseStorage", "Attempting to load image from path: " + path);
+        StorageReference storageRef = storage.getReferenceFromUrl(path);
+
+
+        storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Picasso.get().load(uri.toString())
+                        .placeholder(R.drawable.plotting)  // Placeholder image
+                        .error(R.drawable.baseline_home_24)        // Error image
+                        .into(imageView);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                imageView.setImageResource(R.drawable.baseline_home_24);  // Fallback image on failure
+                Log.e("FirebaseStorage", "Error getting image", exception);
+            }
+        });
+    }
+
     private void fetchExerciseData() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Exercises").document("PSolvedEx2")
@@ -97,12 +131,11 @@ public class PSolvedEx2 extends Fragment {
 
 
                         // Load the graph image
-                        String graphUrl = documentSnapshot.getString("graphURL");
-                        if (graphUrl != null && !graphUrl.isEmpty()) {
-                            Picasso.get().load(graphUrl).into(imageViewGraph);
+                        String graphPath = documentSnapshot.getString("graphURL");
+                        if (graphPath != null && !graphPath.isEmpty()) {
+                            fetchAndDisplayImage(imageViewGraph, graphPath);
                         } else {
-                            // Document does not exist
-                            // Handle this case
+                            Log.e("DataError", "No path for the image available");
                         }
                     }
                 })

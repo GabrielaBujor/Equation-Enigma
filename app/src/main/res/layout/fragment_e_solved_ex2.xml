@@ -87,7 +87,8 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:contentDescription="Graph"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter"
+            android:layout_marginTop="10dp"/>
 
         <Button
             android:id="@+id/homeButton"
@@ -96,7 +97,8 @@
             android:text="Back to homepage"
             android:layout_gravity="center_horizontal"
             android:backgroundTint="@drawable/rounded_button"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"/>
     </LinearLayout>
 
 </ScrollView>

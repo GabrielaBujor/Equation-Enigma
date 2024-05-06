@@ -89,22 +89,28 @@ public class ESolvedEx2 extends Fragment {
 
     private void fetchAndDisplayImage(ImageView imageView, String path) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference();
-        StorageReference pathReference = storageRef.child(path);
+        // Check if the path is a full 'gs://' URL or just a filename
+        if (!path.startsWith("gs://")) {
+            // Assume the file is stored at the root of the Firebase Storage bucket
+            path = "gs://equation-enigma.appspot.com/" + path;
+        }
+        Log.d("FirebaseStorage", "Attempting to load image from path: " + path);
+        StorageReference storageRef = storage.getReferenceFromUrl(path);
 
-        pathReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+
+        storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 Picasso.get().load(uri.toString())
-                        .placeholder(R.drawable.plotting)
-                        .error(R.drawable.plotting)
+                        .placeholder(R.drawable.plotting)  // Placeholder image
+                        .error(R.drawable.baseline_home_24)        // Error image
                         .into(imageView);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onFailure(@NonNull Exception ex) {
-                imageView.setImageResource(R.drawable.plotting);
-                Log.e("FirebaseStorage", "Error getting image", ex);
+            public void onFailure(@NonNull Exception exception) {
+                imageView.setImageResource(R.drawable.baseline_home_24);  // Fallback image on failure
+                Log.e("FirebaseStorage", "Error getting image", exception);
             }
         });
     }
@@ -142,9 +148,6 @@ public class ESolvedEx2 extends Fragment {
 
                     // Inform the user that an error occurred
                     Toast.makeText(getContext(), "Error loading exercise.", Toast.LENGTH_SHORT).show();
-
-                    // You can also update the UI to reflect the error
-                    // For example, hiding the loading indicator or showing an error message directly in the UI
                 });
     }
 }
