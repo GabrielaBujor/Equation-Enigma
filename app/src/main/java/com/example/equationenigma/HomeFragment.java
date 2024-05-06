@@ -99,32 +99,30 @@ public class HomeFragment extends Fragment {
     private void prepareFragmentMap() {
         fragmentMap = new HashMap<>();
         // Use chapter and exercise names to create  unique keys
-        fragmentMap.put(new ChapterExerciseKey("Power", "Solved ex 1"), PSolvedEx1.class);
-        fragmentMap.put(new ChapterExerciseKey("Power", "Solved ex 2"), PSolvedEx2.class);
+        fragmentMap.put(new ChapterExerciseKey("Power", "Solved exercise 1"), PSolvedEx1.class);
+        fragmentMap.put(new ChapterExerciseKey("Power", "Solved exercise 2"), PSolvedEx2.class);
         fragmentMap.put(new ChapterExerciseKey("Power", "Exercise 1"), PEx1.class);
         fragmentMap.put(new ChapterExerciseKey("Power", "Exercise 2"), PEx2.class);
         fragmentMap.put(new ChapterExerciseKey("Power", "Exercise 3"), PEx3.class);
-        fragmentMap.put(new ChapterExerciseKey("Roots", "Solved ex 1"), RSolvedEx1.class);
-        fragmentMap.put(new ChapterExerciseKey("Roots", "Solved ex 2"), RSolvedEx2.class);
+        fragmentMap.put(new ChapterExerciseKey("Roots", "Solved exercise 1"), RSolvedEx1.class);
+        fragmentMap.put(new ChapterExerciseKey("Roots", "Solved exercise 2"), RSolvedEx2.class);
         fragmentMap.put(new ChapterExerciseKey("Roots", "Exercise 1"), REx1.class);
         fragmentMap.put(new ChapterExerciseKey("Roots", "Exercise 2"), REx2.class);
         fragmentMap.put(new ChapterExerciseKey("Roots", "Exercise 3"), REx3.class);
-        fragmentMap.put(new ChapterExerciseKey("Exponential", "Solved ex 1"), ESolvedEx1.class);
-        fragmentMap.put(new ChapterExerciseKey("Exponential", "Solved ex 2"), ESolvedEx2.class);
+        fragmentMap.put(new ChapterExerciseKey("Exponential", "Solved exercise 1"), ESolvedEx1.class);
+        fragmentMap.put(new ChapterExerciseKey("Exponential", "Solved exercise 2"), ESolvedEx2.class);
         fragmentMap.put(new ChapterExerciseKey("Exponential", "Exercise 1"), EEx1.class);
         fragmentMap.put(new ChapterExerciseKey("Exponential", "Exercise 2"), EEx2.class);
         fragmentMap.put(new ChapterExerciseKey("Exponential", "Exercise 3"), EEx3.class);
-        fragmentMap.put(new ChapterExerciseKey("Logarithmic", "Solved ex 1"), LSolvedEx1.class);
-        fragmentMap.put(new ChapterExerciseKey("Logarithmic", "Solved ex 2"), LSolvedEx2.class);
+        fragmentMap.put(new ChapterExerciseKey("Logarithmic", "Solved exercise 1"), LSolvedEx1.class);
+        fragmentMap.put(new ChapterExerciseKey("Logarithmic", "Solved exercise 2"), LSolvedEx2.class);
         fragmentMap.put(new ChapterExerciseKey("Logarithmic", "Exercise 1"), LEx1.class);
         fragmentMap.put(new ChapterExerciseKey("Logarithmic", "Exercise 2"), LEx2.class);
         fragmentMap.put(new ChapterExerciseKey("Logarithmic", "Exercise 3"), LEx3.class);
     }
 
 
-    /*
-     * Preparing the list data
-     */
+
     private void prepareListData() {
         listDataHeader = new ArrayList<String>();
         listDataChild = new HashMap<>();
@@ -138,29 +136,29 @@ public class HomeFragment extends Fragment {
 
         // Adding child data for the chapters
         List<String> powerExercises = new ArrayList<>();
-        powerExercises.add("Solved ex 1");
-        powerExercises.add("Solved ex 2");
+        powerExercises.add("Solved exercise 1");
+        powerExercises.add("Solved exercise 2");
         powerExercises.add("Exercise 1");
         powerExercises.add("Exercise 2");
         powerExercises.add("Exercise 3");
 
         List<String> rootsExercises = new ArrayList<>();
-        rootsExercises.add("Solved ex 1");
-        rootsExercises.add("Solved ex 2");
+        rootsExercises.add("Solved exercise 1");
+        rootsExercises.add("Solved exercise 2");
         rootsExercises.add("Exercise 1");
         rootsExercises.add("Exercise 2");
         rootsExercises.add("Exercise 3");
 
         List<String> logarithmicExercises = new ArrayList<>();
-        logarithmicExercises.add("Solved ex 1");
-        logarithmicExercises.add("Solved ex 2");
+        logarithmicExercises.add("Solved exercise 1");
+        logarithmicExercises.add("Solved exercise 2");
         logarithmicExercises.add("Exercise 1");
         logarithmicExercises.add("Exercise 2");
         logarithmicExercises.add("Exercise 3");
 
         List<String> exponentialExercises = new ArrayList<>();
-        exponentialExercises.add("Solved ex 1");
-        exponentialExercises.add("Solved ex 2");
+        exponentialExercises.add("Solved exercise 1");
+        exponentialExercises.add("Solved exercise 2");
         exponentialExercises.add("Exercise 1");
         exponentialExercises.add("Exercise 2");
         exponentialExercises.add("Exercise 3");

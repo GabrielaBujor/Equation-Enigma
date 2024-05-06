@@ -80,7 +80,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter{
         Chapter chapter = (Chapter) getGroup(groupPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(android.R.layout.simple_expandable_list_item_1, null);
+            convertView = layoutInflater.inflate(R.layout.group_item, null);
         }
         TextView listTitleTextView = (TextView) convertView.findViewById(android.R.id.text1);
         listTitleTextView.setText(chapter.getTitle());

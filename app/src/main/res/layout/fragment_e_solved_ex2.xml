@@ -85,8 +85,9 @@
         <ImageView
             android:id="@+id/imageViewGraph"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:contentDescription="Graph"/>
+            android:layout_height="200dp"
+            android:contentDescription="Graph"
+            android:scaleType="fitCenter"/>
 
         <Button
             android:id="@+id/homeButton"

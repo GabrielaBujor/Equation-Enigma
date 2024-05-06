@@ -1,7 +1,9 @@
 package com.example.equationenigma.Exponential;
 
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -17,7 +19,12 @@ import android.widget.Toast;
 import com.example.equationenigma.HomeFragment;
 import com.example.equationenigma.Power.PSolvedEx1;
 import com.example.equationenigma.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 
@@ -80,6 +87,28 @@ public class ESolvedEx2 extends Fragment {
         return view;
     }
 
+    private void fetchAndDisplayImage(ImageView imageView, String path) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+        StorageReference pathReference = storageRef.child(path);
+
+        pathReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Picasso.get().load(uri.toString())
+                        .placeholder(R.drawable.plotting)
+                        .error(R.drawable.plotting)
+                        .into(imageView);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception ex) {
+                imageView.setImageResource(R.drawable.plotting);
+                Log.e("FirebaseStorage", "Error getting image", ex);
+            }
+        });
+    }
+
     private void fetchExerciseData() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Exercises").document("ESolvedEx2")
@@ -99,12 +128,11 @@ public class ESolvedEx2 extends Fragment {
 
 
                         // Load the graph image
-                        String graphUrl = documentSnapshot.getString("graphURL");
-                        if (graphUrl != null && !graphUrl.isEmpty()) {
-                            Picasso.get().load(graphUrl).into(imageViewGraph);
+                        String graphPath = documentSnapshot.getString("graphURL");
+                        if (graphPath != null && !graphPath.isEmpty()) {
+                            fetchAndDisplayImage(imageViewGraph, graphPath);
                         } else {
-                            // Document does not exist
-                            // Handle this case
+                            Log.e("DataError", "No path for the image available");
                         }
                     }
                 })
