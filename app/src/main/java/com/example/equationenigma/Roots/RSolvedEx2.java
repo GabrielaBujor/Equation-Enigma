@@ -101,14 +101,14 @@ public class RSolvedEx2 extends Fragment {
             @Override
             public void onSuccess(Uri uri) {
                 Picasso.get().load(uri.toString())
-                        .placeholder(R.drawable.plotting)  // Placeholder image
-                        .error(R.drawable.baseline_home_24)        // Error image
+                        .placeholder(R.drawable.loading)  // Placeholder image
+                        .error(R.drawable.error)        // Error image
                         .into(imageView);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                imageView.setImageResource(R.drawable.baseline_home_24);  // Fallback image on failure
+                imageView.setImageResource(R.drawable.error);  // Fallback image on failure
                 Log.e("FirebaseStorage", "Error getting image", exception);
             }
         });
