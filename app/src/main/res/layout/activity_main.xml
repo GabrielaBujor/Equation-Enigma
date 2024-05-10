@@ -8,13 +8,13 @@
     android:background="@drawable/background"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Main activity"
-        android:gravity="center"
-        android:textSize="30dp"
-        android:textColor="@color/black"/>
+<!--    <TextView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:text="Main activity"-->
+<!--        android:gravity="center"-->
+<!--        android:textSize="30dp"-->
+<!--        android:textColor="@color/black"/>-->
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="0dp"
         app:menu="@menu/bottom_navigation_menu"
-        android:background="@color/bottom_navigation"
+        android:background="#FDB55E"
         android:layout_gravity="bottom"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -66,11 +66,11 @@ public class ChaptersExpandableListAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = infalInflater.inflate(android.R.layout.simple_expandable_list_item_1, null);
+            convertView = infalInflater.inflate(R.layout.group_item, parent, false);
         }
 
         TextView lblListHeader = (TextView) convertView
-                .findViewById(android.R.id.text1);
+                .findViewById(R.id.tvGroup);
         lblListHeader.setTypeface(null, Typeface.BOLD);
         lblListHeader.setText(headerTitle);
 

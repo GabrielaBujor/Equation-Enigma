@@ -1,27 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".QuizFragment"
-    android:background="@drawable/background">
+    android:orientation="vertical"
+    android:padding="8dp">
 
-<!--    <androidx.appcompat.widget.Toolbar-->
-<!--        android:id="@+id/my_toolbar"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="?attr/actionBarSize"-->
-<!--        android:background="@drawable/background"-->
-<!--        android:elevation="4dp"-->
-<!--        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"-->
-<!--        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />-->
-
-    <TextView
+    <ListView
+        android:id="@+id/quiz_listView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Quiz"
-        android:gravity="center"
-        android:textSize="30dp"
-        android:textColor="@color/black"/>
-
-</FrameLayout>
+        android:layout_height="match_parent" />
+</LinearLayout>

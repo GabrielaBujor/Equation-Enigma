@@ -42,6 +42,8 @@ import com.squareup.picasso.Picasso;
 public class UserProfileFragment extends Fragment {
 
     private TextView textFullName, textEmail;
+    private TextView textUserType;
+
     private ImageView profilePicture;
     private Button buttonEditProfile, buttonLogout;
     //private Button buttonDeleteAccount;
@@ -62,9 +64,12 @@ public class UserProfileFragment extends Fragment {
 
         textFullName = view.findViewById(R.id.text_full_name);
         textEmail = view.findViewById(R.id.text_email);
+        textUserType = view.findViewById(R.id.text_user_type);
+
         buttonEditProfile = view.findViewById(R.id.button_edit_profile);
         buttonLogout = view.findViewById(R.id.button_logout);
 //        buttonDeleteAccount = view.findViewById(R.id.button_delete_account);
+
         progressBar = view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
@@ -77,9 +82,13 @@ public class UserProfileFragment extends Fragment {
                 if(dataSnapshot.exists()) {
                     String fullName = dataSnapshot.child("fullName").getValue(String.class);
                     String email = dataSnapshot.child("email").getValue(String.class);
+                    String userType = dataSnapshot.child("userType").getValue(String.class);
+                    Log.d("UserProfileFragment", "Retrieved user type: " + userType);
+
 
                     textFullName.setText(fullName != null ? fullName : "Name not available");
                     textEmail.setText(email != null ? email : "Email not available");
+                    textUserType.setText(userType != null ? userType : "User type not available");
                 }
             }
 

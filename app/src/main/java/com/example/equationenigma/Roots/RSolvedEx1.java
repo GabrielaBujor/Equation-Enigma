@@ -79,7 +79,7 @@ public class RSolvedEx1 extends Fragment {
             FragmentManager fragmentManager = getParentFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.frame_layout, new HomeFragment()) // 'R.id.fragment_container' is the container ID from the main activity's layout.
-                    .addToBackStack(null) // Optional, if you want to add the transaction to the back stack.
+                    .addToBackStack(null)
                     .commit();
         });
 
