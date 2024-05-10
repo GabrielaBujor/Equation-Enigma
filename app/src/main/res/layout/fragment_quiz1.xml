@@ -129,5 +129,7 @@
         android:text="Back to main page"
         android:layout_gravity="center_horizontal"
         android:visibility="gone"
-        android:onClick="onBackToMainClicked"/>
+        android:onClick="onBackToMainClicked"
+        android:background="@drawable/rounded_button"
+        android:layout_marginBottom="35dp"/>
 </LinearLayout>
