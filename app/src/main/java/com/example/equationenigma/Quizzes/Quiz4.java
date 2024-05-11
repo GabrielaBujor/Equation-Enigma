@@ -1,66 +1,200 @@
 package com.example.equationenigma.Quizzes;
 
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
+import com.example.equationenigma.HomeFragment;
+import com.example.equationenigma.QuizFragment;
 import com.example.equationenigma.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link Quiz4#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class Quiz4 extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private TextView timerTextView;
+    private Button backButton;
+    private final boolean[] matchStatus = new boolean[4]; // Track if each function is matched
+    private final ImageView[] graphViews = new ImageView[4];
+    private final TextView[] functionViews = new TextView[4];
+    private int selectedFunctionIndex = -1; // -1 indicates no function is selected
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private int secondsElapsed = 0;
+    private Handler timerHandler = new Handler();
+    private boolean timerRunning = false;
+    private Runnable timerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (timerRunning) {
+                updateTimer();
+                timerHandler.postDelayed(this, 1000); // Schedule the update again after 1 second
+            }
+        }
+    };
 
     public Quiz4() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment Quiz4.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static Quiz4 newInstance(String param1, String param2) {
-        Quiz4 fragment = new Quiz4();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
+    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_quiz4, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_quiz4, container, false);
+        // Initialize views
+        initializeViews(rootView);
+
+        // Set listeners for functions and graphs
+        setupFunctionListeners();
+        setupGraphListeners();
+
+        // Start the timer
+        startTimer();
+
+        backButton.setOnClickListener(v -> goBackToQuizFragment());
+
+        return rootView;
+    }
+
+    private void initializeViews(View rootView) {
+        // Timer and button
+        timerTextView = rootView.findViewById(R.id.timerTextView);
+        backButton = rootView.findViewById(R.id.backToMainButton);
+
+        // Functions
+        functionViews[0] = rootView.findViewById(R.id.function1);
+        functionViews[1] = rootView.findViewById(R.id.function2);
+        functionViews[2] = rootView.findViewById(R.id.function3);
+        functionViews[3] = rootView.findViewById(R.id.function4);
+
+        // Graphs
+        graphViews[0] = rootView.findViewById(R.id.graph3);
+        graphViews[1] = rootView.findViewById(R.id.graph1);
+        graphViews[2] = rootView.findViewById(R.id.graph4);
+        graphViews[3] = rootView.findViewById(R.id.graph2);
+    }
+
+    private void setupFunctionListeners() {
+        for (int i = 0; i < functionViews.length; i++) {
+            final int index = i;
+            functionViews[i].setOnClickListener(v -> onFunctionSelected(index));
+        }
+    }
+
+    private void setupGraphListeners() {
+        for (int i = 0; i < graphViews.length; i++) {
+            final int index = i;
+            graphViews[i].setOnClickListener(v -> onGraphSelected(index));
+        }
+    }
+
+    private void onFunctionSelected(int index) {
+        // Highlight the selected function
+        for (int i = 0; i < functionViews.length; i++) {
+            functionViews[i].setBackgroundColor(i == index ? Color.LTGRAY : Color.TRANSPARENT);
+        }
+        selectedFunctionIndex = index;
+    }
+
+    private void onGraphSelected(int index) {
+        if (selectedFunctionIndex == -1) {
+            // No function selected
+            return;
+        }
+
+        // Check if the function and graph match
+        if (checkMatch(selectedFunctionIndex, index)) {
+            // Correct match
+            matchStatus[index] = true;
+            graphViews[index].setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY); // Indicate match visually
+            functionViews[selectedFunctionIndex].setBackgroundColor(Color.LTGRAY); // Set function background to gray
+            functionViews[selectedFunctionIndex].setClickable(false); // Prevent re-selection
+            graphViews[index].setClickable(false); // Prevent re-selection
+
+            // Reset selection
+            selectedFunctionIndex = -1;
+            for (TextView functionView : functionViews) {
+                functionView.setBackgroundColor(Color.TRANSPARENT);
+            }
+
+            // Check if all are matched
+            if (allMatchesCorrect()) {
+                showBackButtonAndStopTimer();
+            }
+        } else {
+            // Incorrect match
+            Toast.makeText(getContext(), "Incorrect match, try again!", Toast.LENGTH_SHORT).show();
+            functionViews[selectedFunctionIndex].setBackgroundColor(Color.TRANSPARENT);
+            selectedFunctionIndex = -1;
+        }
+    }
+
+
+    private boolean checkMatch(int functionIndex, int graphIndex) {
+        // Correct match if indices are the same
+        return functionIndex == graphIndex;
+    }
+
+    private boolean allMatchesCorrect() {
+        for (boolean matched : matchStatus) {
+            if (!matched) return false;
+        }
+        return true;
+    }
+
+    private void showBackButtonAndStopTimer() {
+        backButton.setVisibility(View.VISIBLE);
+        stopTimer();
+    }
+
+    private void startTimer() {
+        timerRunning = true;
+        timerHandler.postDelayed(timerRunnable, 0);
+    }
+
+    private void stopTimer() {
+        timerRunning = false;
+        timerHandler.removeCallbacks(timerRunnable);
+    }
+
+    private void updateTimer() {
+        int minutes = secondsElapsed / 60;
+        int seconds = secondsElapsed % 60;
+        String timeString = String.format("%02d:%02d", minutes, seconds);
+        timerTextView.setText(timeString);
+        secondsElapsed++;
+    }
+
+    private void goBackToQuizFragment() {
+        if (getActivity() != null) {
+            getActivity().getSupportFragmentManager().popBackStack();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopTimer();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!timerRunning) {
+            startTimer();
+        }
     }
 }
