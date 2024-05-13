@@ -16,12 +16,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
-import com.example.equationenigma.HomeFragment;
-import com.example.equationenigma.QuizFragment;
 import com.example.equationenigma.QuizReport;
 import com.example.equationenigma.R;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -128,32 +126,76 @@ public class Quiz4 extends Fragment {
             return;
         }
 
-        // Set the graph to which this function is matched
-        matchedWith[selectedFunctionIndex] = index;
-        graphViews[index].setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY); // Indicate matched visually
-        functionViews[selectedFunctionIndex].setBackgroundColor(Color.LTGRAY); // Set function background to gray
-        functionViews[selectedFunctionIndex].setClickable(false); // Prevent re-selection
-        graphViews[index].setClickable(false); // Prevent re-selection
+        matchedWith[selectedFunctionIndex] = index; // Record which graph was selected for which function
+        boolean isMatchCorrect = checkMatch(selectedFunctionIndex, index);
+        matchStatus[selectedFunctionIndex] = isMatchCorrect;
 
-        // Reset selection
+        // Update UI based on whether the match was correct or not
+        updateUIAfterMatch(index, isMatchCorrect);
+
+        // Reset selection and check for completion
         selectedFunctionIndex = -1;
+        resetFunctionSelections();
+
+        if (allFunctionsMatched()) {
+            showBackButtonAndStopTimer();
+        } else {
+            // Debugging output
+            System.out.println("Not all functions matched yet.");
+        }
+    }
+
+    private void updateUIAfterMatch(int graphIndex, boolean isMatchCorrect) {
+        graphViews[graphIndex].setColorFilter(isMatchCorrect ? Color.GREEN : Color.RED, PorterDuff.Mode.MULTIPLY);
+        functionViews[selectedFunctionIndex].setBackgroundColor(isMatchCorrect ? Color.LTGRAY : Color.RED);
+        functionViews[selectedFunctionIndex].setClickable(false);
+        graphViews[graphIndex].setClickable(false);
+    }
+
+    private void resetFunctionSelections() {
         for (TextView functionView : functionViews) {
             functionView.setBackgroundColor(Color.TRANSPARENT);
         }
+    }
 
-        // Check if all functions are matched
-        boolean allMatched = true;
+    private boolean allFunctionsMatched() {
         for (int status : matchedWith) {
             if (status == -1) {
-                allMatched = false;
-                break;
+                return false; // Means at least one function hasn't been matched yet
             }
         }
-
-        if (allMatched) {
-            showBackButtonAndStopTimer();
-        }
+        return true; // All functions have been matched
     }
+
+    private void showBackButtonAndStopTimer() {
+        System.out.println("All functions matched. Showing back button and stopping timer.");
+        backButton.setVisibility(View.VISIBLE);
+        stopTimer();
+
+        // Generate report
+        generateAndSaveReport();
+    }
+
+    private void generateAndSaveReport() {
+        // Get the current user's name (or user ID if preferred)
+        String currentUserName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+        // Fallback to "Unknown" if the user is not logged in or if the name is not set
+        if (currentUserName == null || currentUserName.isEmpty()) {
+            currentUserName = "Unknown User"; // or FirebaseAuth.getInstance().getCurrentUser().getUid();
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String reportName = sdf.format(new Date());
+        int mistakes = calculateMistakes();
+        String timeTaken = timerTextView.getText().toString();
+        Map<String, Boolean> detailedResults = new HashMap<>();
+        for (int i = 0; i < functionViews.length; i++) {
+            detailedResults.put(functionViews[i].getText().toString(), matchStatus[i]);
+        }
+        QuizReport report = new QuizReport(currentUserName, reportName, mistakes, timeTaken, detailedResults);
+        saveReportToFirebase(report);
+    }
+
 
     private boolean checkMatch(int functionIndex, int graphIndex) {
         // Correct match if indices are the same
@@ -171,53 +213,42 @@ public class Quiz4 extends Fragment {
         return true;
     }
 
-    private void showBackButtonAndStopTimer() {
-        backButton.setVisibility(View.VISIBLE);
-        stopTimer();
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        String reportName = sdf.format(new Date());
-        int mistakes = calculateMistakes();
-        String timeTaken = timerTextView.getText().toString();
-
-        // Prepare detailed results
-        Map<String, Boolean> detailedResults = new HashMap<>();
-        for (int i = 0; i < functionViews.length; i++) {
-            detailedResults.put(functionViews[i].getText().toString(), checkMatch(i, matchedWith[i]));
-        }
-
-        QuizReport report = new QuizReport(reportName, mistakes, timeTaken, detailedResults);
-
-        saveReportToFirebase(report);
-    }
 
     private void saveReportToFirebase(QuizReport report) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Map<String, Object> reportData = new HashMap<>();
+        reportData.put("userName", report.getUserName());
         reportData.put("reportName", report.getReportName());
         reportData.put("mistakes", report.getMistakes());
         reportData.put("timeTaken", report.getTimeTaken());
-        reportData.put("detailedResults", report.getDetailedResults()); // Store as Boolean Map directly
+        reportData.put("detailedResults", report.getDetailedResults());
 
         db.collection("quizReports")
                 .add(reportData)
                 .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(getContext(), "Report saved!", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) {  // Check if the fragment is currently added to its activity
+                        Toast.makeText(getContext(), "Report saved!", Toast.LENGTH_SHORT).show();
+                    }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Error saving report.", Toast.LENGTH_SHORT).show();
+                    if (isAdded()) {  // Check if the fragment is currently added to its activity
+                        Toast.makeText(getContext(), "Error saving report.", Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 
+
+
     private int calculateMistakes() {
         int mistakes = 0;
-        for (int i = 0; i < matchStatus.length; i++) {
-            if (!matchStatus[i] && matchedWith[i] != -1) {
+        for (boolean wasCorrect : matchStatus) {
+            if (!wasCorrect) {
                 mistakes++;
             }
         }
         return mistakes;
     }
+
 
     private void startTimer() {
         timerRunning = true;

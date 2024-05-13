@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.Map;
 
 public class QuizReport {
+    private String userName;
     private String reportName;
     private int mistakes;
     private String timeTaken;
     private Map<String, Boolean> detailedResults; // Function and its correctness
 
-    public QuizReport(String reportName, int mistakes, String timeTaken, Map<String, Boolean> detailedResults) {
+    public QuizReport(String userName, String reportName, int mistakes, String timeTaken, Map<String, Boolean> detailedResults) {
+        this.userName = userName;
         this.reportName = reportName;
         this.mistakes = mistakes;
         this.timeTaken = timeTaken;
@@ -17,6 +19,9 @@ public class QuizReport {
     }
 
     // Getters
+    public String getUserName() {
+        return userName;
+    }
     public String getReportName() {
         return reportName;
     }

@@ -14,6 +14,8 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -66,27 +68,29 @@ public class ReportFragment extends Fragment {
 
     private void loadReports() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String currentUserName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
+
         db.collection("quizReports")
+                .whereEqualTo("userName", currentUserName)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         reports.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
+                            String userName = document.getString("userName");
                             String reportName = document.getString("reportName");
                             int mistakes = ((Long) document.get("mistakes")).intValue();
                             String timeTaken = document.getString("timeTaken");
-                            Map<String, Object> rawResults = (Map<String, Object>) document.get("detailedResults");
-                            Map<String, Boolean> detailedResults = convertMap(rawResults);  // Convert before passing to QuizReport
-
-                            reports.add(new QuizReport(reportName, mistakes, timeTaken, detailedResults));
+                            Map<String, Boolean> detailedResults = (Map<String, Boolean>) document.get("detailedResults");
+                            reports.add(new QuizReport(userName, reportName, mistakes, timeTaken, detailedResults));
                         }
                         reportAdapter.notifyDataSetChanged();
                     } else {
                         Toast.makeText(getContext(), "Error getting reports.", Toast.LENGTH_SHORT).show();
                     }
                 });
-
     }
+
 
 
 }
