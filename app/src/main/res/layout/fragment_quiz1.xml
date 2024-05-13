@@ -93,29 +93,29 @@
             <!-- Graph ImageViews -->
             <ImageView
                 android:id="@+id/graph1"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:src="@drawable/graph13"
                 android:layout_marginBottom="16dp"/>
 
             <ImageView
                 android:id="@+id/graph2"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:src="@drawable/graph14"
                 android:layout_marginBottom="16dp"/>
 
             <ImageView
                 android:id="@+id/graph3"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:src="@drawable/graph11"
                 android:layout_marginBottom="16dp"/>
 
             <ImageView
                 android:id="@+id/graph4"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:src="@drawable/graph12"
                 android:layout_marginBottom="16dp"/>
         </LinearLayout>
@@ -131,5 +131,6 @@
         android:visibility="gone"
         android:onClick="onBackToMainClicked"
         android:background="@drawable/rounded_button"
-        android:layout_marginBottom="35dp"/>
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="45dp"/>
 </LinearLayout>

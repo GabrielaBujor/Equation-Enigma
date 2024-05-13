@@ -132,5 +132,6 @@
         android:visibility="gone"
         android:onClick="onBackToMainClicked"
         android:background="@drawable/rounded_button"
-        android:layout_marginBottom="35dp"/>
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="45dp"/>
 </LinearLayout>

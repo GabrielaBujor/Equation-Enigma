@@ -20,7 +20,15 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.equationenigma.HomeFragment;
 import com.example.equationenigma.QuizFragment;
+import com.example.equationenigma.QuizReport;
 import com.example.equationenigma.R;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class Quiz2 extends Fragment {
 
@@ -29,6 +37,7 @@ public class Quiz2 extends Fragment {
     private final boolean[] matchStatus = new boolean[4]; // Track if each function is matched
     private final ImageView[] graphViews = new ImageView[4];
     private final TextView[] functionViews = new TextView[4];
+    private final int[] matchedWith = new int[4]; // Store the index of the graph each function is matched with
     private int selectedFunctionIndex = -1; // -1 indicates no function is selected
 
     private int secondsElapsed = 0;
@@ -55,12 +64,16 @@ public class Quiz2 extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_quiz2, container, false);
+
         // Initialize views
         initializeViews(rootView);
 
         // Set listeners for functions and graphs
         setupFunctionListeners();
         setupGraphListeners();
+
+        // Initialize matchedWith array with -1 indicating no matches
+        java.util.Arrays.fill(matchedWith, -1);
 
         // Start the timer
         startTimer();
@@ -116,33 +129,32 @@ public class Quiz2 extends Fragment {
             return;
         }
 
-        // Check if the function and graph match
-        if (checkMatch(selectedFunctionIndex, index)) {
-            // Correct match
-            matchStatus[index] = true;
-            graphViews[index].setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY); // Indicate match visually
-            functionViews[selectedFunctionIndex].setBackgroundColor(Color.LTGRAY); // Set function background to gray
-            functionViews[selectedFunctionIndex].setClickable(false); // Prevent re-selection
-            graphViews[index].setClickable(false); // Prevent re-selection
+        // Set the graph to which this function is matched
+        matchedWith[selectedFunctionIndex] = index;
+        graphViews[index].setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY); // Indicate matched visually
+        functionViews[selectedFunctionIndex].setBackgroundColor(Color.LTGRAY); // Set function background to gray
+        functionViews[selectedFunctionIndex].setClickable(false); // Prevent re-selection
+        graphViews[index].setClickable(false); // Prevent re-selection
 
-            // Reset selection
-            selectedFunctionIndex = -1;
-            for (TextView functionView : functionViews) {
-                functionView.setBackgroundColor(Color.TRANSPARENT);
-            }
+        // Reset selection
+        selectedFunctionIndex = -1;
+        for (TextView functionView : functionViews) {
+            functionView.setBackgroundColor(Color.TRANSPARENT);
+        }
 
-            // Check if all are matched
-            if (allMatchesCorrect()) {
-                showBackButtonAndStopTimer();
+        // Check if all functions are matched
+        boolean allMatched = true;
+        for (int status : matchedWith) {
+            if (status == -1) {
+                allMatched = false;
+                break;
             }
-        } else {
-            // Incorrect match
-            Toast.makeText(getContext(), "Incorrect match, try again!", Toast.LENGTH_SHORT).show();
-            functionViews[selectedFunctionIndex].setBackgroundColor(Color.TRANSPARENT);
-            selectedFunctionIndex = -1;
+        }
+
+        if (allMatched) {
+            showBackButtonAndStopTimer();
         }
     }
-
 
     private boolean checkMatch(int functionIndex, int graphIndex) {
         // Correct match if indices are the same
@@ -150,8 +162,12 @@ public class Quiz2 extends Fragment {
     }
 
     private boolean allMatchesCorrect() {
-        for (boolean matched : matchStatus) {
-            if (!matched) return false;
+        for (int i = 0; i < matchStatus.length; i++) {
+            if (matchedWith[i] != -1) {
+                matchStatus[i] = checkMatch(i, matchedWith[i]);
+            } else {
+                return false;
+            }
         }
         return true;
     }
@@ -159,6 +175,49 @@ public class Quiz2 extends Fragment {
     private void showBackButtonAndStopTimer() {
         backButton.setVisibility(View.VISIBLE);
         stopTimer();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        String reportName = sdf.format(new Date());
+        int mistakes = calculateMistakes();
+        String timeTaken = timerTextView.getText().toString();
+
+        // Prepare detailed results
+        Map<String, Boolean> detailedResults = new HashMap<>();
+        for (int i = 0; i < functionViews.length; i++) {
+            detailedResults.put(functionViews[i].getText().toString(), checkMatch(i, matchedWith[i]));
+        }
+
+        QuizReport report = new QuizReport(reportName, mistakes, timeTaken, detailedResults);
+
+        saveReportToFirebase(report);
+    }
+
+    private void saveReportToFirebase(QuizReport report) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Map<String, Object> reportData = new HashMap<>();
+        reportData.put("reportName", report.getReportName());
+        reportData.put("mistakes", report.getMistakes());
+        reportData.put("timeTaken", report.getTimeTaken());
+        reportData.put("detailedResults", report.getDetailedResults()); // Store as Boolean Map directly
+
+        db.collection("quizReports")
+                .add(reportData)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(getContext(), "Report saved!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error saving report.", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private int calculateMistakes() {
+        int mistakes = 0;
+        for (int i = 0; i < matchStatus.length; i++) {
+            if (!matchStatus[i] && matchedWith[i] != -1) {
+                mistakes++;
+            }
+        }
+        return mistakes;
     }
 
     private void startTimer() {
