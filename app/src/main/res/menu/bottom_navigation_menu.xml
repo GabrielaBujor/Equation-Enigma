@@ -5,20 +5,24 @@
     <item
         android:id="@+id/navigation_home"
         android:icon="@drawable/baseline_home_24"
-        android:title="Lessons" />
+        android:title="Lessons"
+        android:textColor="@color/black"/>
 
     <item
         android:id="@+id/navigation_quiz"
         android:icon="@drawable/quiz_icon"
-        android:title="Quizzes" />
+        android:title="Quizzes"
+        android:textColor="@color/black"/>
 
     <item
         android:id="@+id/navigation_report"
         android:icon="@drawable/report_icon"
-        android:title="Reports" />
+        android:title="Reports"
+        android:textColor="@color/black"/>
 
     <item
         android:id="@+id/navigation_profile"
         android:icon="@drawable/baseline_person_24"
-        android:title="Profile" />
+        android:title="Profile"
+        android:textColor="@color/black"/>
 </menu>
