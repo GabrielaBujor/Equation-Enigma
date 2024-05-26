@@ -6,9 +6,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -16,6 +20,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -28,6 +38,7 @@ public class ReportFragment extends Fragment {
     private RecyclerView reportsRecyclerView;
     private ReportAdapter reportAdapter;
     private List<QuizReport> reports = new ArrayList<>();
+    private EditText searchInput;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,55 +53,88 @@ public class ReportFragment extends Fragment {
         reportAdapter = new ReportAdapter(reports);
         reportsRecyclerView.setAdapter(reportAdapter);
 
-        // Load reports from Firestore
-        loadReports();
+        searchInput = rootView.findViewById(R.id.searchInput);
+        Button searchButton = rootView.findViewById(R.id.searchButton);
+
+        // Determine the user type and load data accordingly
+        determineUserTypeAndLoadReports();
+
+        // Setup search button click listener for teachers
+        searchButton.setOnClickListener(v -> {
+            String searchText = searchInput.getText().toString().trim();
+            if (!TextUtils.isEmpty(searchText)) {
+                searchStudentsReports(searchText);
+            } else {
+                Toast.makeText(getContext(), "Please enter a student name to search.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return rootView;
     }
 
-    private Map<String, Boolean> convertMap(Map<String, Object> rawMap) {
-        Map<String, Boolean> resultMap = new HashMap<>();
-        if (rawMap != null) {
-            for (Map.Entry<String, Object> entry : rawMap.entrySet()) {
-                Object value = entry.getValue();
-                if (value instanceof Boolean) {  // Make sure the value is actually a Boolean
-                    resultMap.put(entry.getKey(), (Boolean) value);
+    private void determineUserTypeAndLoadReports() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users").child(auth.getUid());
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String userType = dataSnapshot.child("userType").getValue(String.class);
+                if ("Teacher".equals(userType)) {
+                    // Allow teachers to search
+                    searchInput.setEnabled(true);
                 } else {
-                    // Handle the case where the value is not a Boolean
-                    // Depending on your logic, you may throw an exception, log a warning, or set a default value
-                    resultMap.put(entry.getKey(), false);  // Assuming default to false if type is incorrect
+                    // Load only the logged-in student's reports
+                    loadReportsForUser(auth.getUid());
                 }
             }
-        }
-        return resultMap;
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getContext(), "Failed to load user data: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-
-    private void loadReports() {
+    private void loadReportsForUser(String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String currentUserName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-
         db.collection("quizReports")
-                .whereEqualTo("userName", currentUserName)
+                .whereEqualTo("userId", userId)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         reports.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            String userName = document.getString("userName");
-                            String reportName = document.getString("reportName");
-                            int mistakes = ((Long) document.get("mistakes")).intValue();
-                            String timeTaken = document.getString("timeTaken");
-                            Map<String, Boolean> detailedResults = (Map<String, Boolean>) document.get("detailedResults");
-                            reports.add(new QuizReport(userName, reportName, mistakes, timeTaken, detailedResults));
+                            QuizReport report = document.toObject(QuizReport.class);
+                            reports.add(report);
                         }
                         reportAdapter.notifyDataSetChanged();
                     } else {
-                        Toast.makeText(getContext(), "Error getting reports.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Error getting reports: " + task.getException(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-
-
+    private void searchStudentsReports(String studentName) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        // Search based on a 'name' field in reports - adjust if using a different field
+        db.collection("quizReports")
+                .whereEqualTo("studentName", studentName)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        reports.clear();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            QuizReport report = document.toObject(QuizReport.class);
+                            reports.add(report);
+                        }
+                        reportAdapter.notifyDataSetChanged();
+                        if (reports.isEmpty()) {
+                            Toast.makeText(getContext(), "No reports found for that student.", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Error searching reports: " + task.getException(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 }

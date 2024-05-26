@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -175,23 +176,32 @@ public class Quiz1 extends Fragment {
     }
 
     private void generateAndSaveReport() {
-        // Get the current user's name (or user ID if preferred)
-        String currentUserName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
-        // Fallback to "Unknown" if the user is not logged in or if the name is not set
-        if (currentUserName == null || currentUserName.isEmpty()) {
-            currentUserName = "Unknown User"; // or FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String userId = (auth.getCurrentUser() != null) ? auth.getCurrentUser().getUid() : null;
+        if (userId == null) {
+            Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String reportName = sdf.format(new Date());
         int mistakes = calculateMistakes();
         String timeTaken = timerTextView.getText().toString();
-        Map<String, Boolean> detailedResults = new HashMap<>();
+        Map<String, Object> detailedResults = new HashMap<>();
         for (int i = 0; i < functionViews.length; i++) {
             detailedResults.put(functionViews[i].getText().toString(), matchStatus[i]);
         }
-        QuizReport report = new QuizReport(currentUserName, reportName, mistakes, timeTaken, detailedResults);
-        saveReportToFirebase(report);
+
+        Map<String, Object> reportData = new HashMap<>();
+        reportData.put("userId", userId); // Ensure this key matches the one expected in Firestore rules
+        reportData.put("reportName", reportName);
+        reportData.put("mistakes", mistakes);
+        reportData.put("timeTaken", timeTaken);
+        reportData.put("detailedResults", detailedResults);
+
+        Log.d("Quiz 1", "Preparing to save report with data: " + reportData);
+
+        saveReportToFirebase(reportData);
     }
 
 
@@ -212,14 +222,8 @@ public class Quiz1 extends Fragment {
     }
 
 
-    private void saveReportToFirebase(QuizReport report) {
+    private void saveReportToFirebase(Map<String, Object> reportData) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Map<String, Object> reportData = new HashMap<>();
-        reportData.put("userName", report.getUserName());
-        reportData.put("reportName", report.getReportName());
-        reportData.put("mistakes", report.getMistakes());
-        reportData.put("timeTaken", report.getTimeTaken());
-        reportData.put("detailedResults", report.getDetailedResults());
 
         db.collection("quizReports")
                 .add(reportData)
@@ -230,10 +234,12 @@ public class Quiz1 extends Fragment {
                 })
                 .addOnFailureListener(e -> {
                     if (isAdded()) {  // Check if the fragment is currently added to its activity
-                        Toast.makeText(getContext(), "Error saving report.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Error saving report: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("Firestore", "Error saving report", e);
                     }
                 });
     }
+
 
 
 

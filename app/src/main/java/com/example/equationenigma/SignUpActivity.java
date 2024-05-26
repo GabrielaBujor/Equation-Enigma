@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -37,6 +38,8 @@ public class SignUpActivity extends AppCompatActivity {
     private Button buttonSignUp;
 
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    private DatabaseReference dbRT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,15 @@ public class SignUpActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        dbRT = FirebaseDatabase.getInstance().getReference("Users");
+
+        setupUI();
+        setupSignUpButton();
+    }
+
+    private void setupUI() {
         editTextFullName = findViewById(R.id.editTextFullName);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
@@ -56,115 +68,104 @@ public class SignUpActivity extends AppCompatActivity {
                 R.array.user_types, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUserType.setAdapter(adapter);
+    }
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference usersRef = database.getReference("Users");
+    private void setupSignUpButton() {
+        buttonSignUp.setOnClickListener(v -> {
+            String fullName = editTextFullName.getText().toString().trim();
+            String email = editTextEmail.getText().toString().trim();
+            String password = editTextPassword.getText().toString().trim();
+            String confirmPassword = editTextConfirmPassword.getText().toString().trim();
+            String userType = spinnerUserType.getSelectedItem().toString();
 
+            if (!validateInputs(fullName, email, password, confirmPassword))
+                return;
 
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            String userId = mAuth.getCurrentUser().getUid();
+                            User newUser = new User(fullName, email, userType);
 
-        buttonSignUp.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               Log.d("SignUpActivity", "Sign up button pressed");
+                            // Write to Firestore
+                            db.collection("Users").document(userId).set(newUser)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d("Firestore", "User Firestore record created successfully for userID: " + userId);
+                                        navigateToLogin();
+                                    })
+                                    .addOnFailureListener(e -> Log.e("Firestore", "Error writing document for userID: " + userId, e));
 
-               mAuth = FirebaseAuth.getInstance();
-
-               String fullName = editTextFullName.getText().toString().trim();
-               String email = editTextEmail.getText().toString().trim();
-               String password = editTextPassword.getText().toString().trim();
-               String confirmPassword = editTextConfirmPassword.getText().toString().trim();
-               String userType = spinnerUserType.getSelectedItem().toString();
-
-               if(fullName.isEmpty()) {
-                   editTextFullName.setError("Full name is required");
-                   editTextFullName.requestFocus();
-                   return;
-               }
-
-               if(email.isEmpty()) {
-                   editTextEmail.setError("Email is required");
-                   editTextEmail.requestFocus();
-                   return;
-               }
-
-               if(password.isEmpty()) {
-                   editTextPassword.setError("Password is required");
-                   editTextPassword.requestFocus();
-                   return;
-               }
-
-               if(!password.equals(confirmPassword)) {
-                   editTextConfirmPassword.setError("Passwords do not match");
-                   editTextConfirmPassword.requestFocus();
-                   return;
-               }
-
-               if(!isValidEmail(email)) {
-                   editTextEmail.setError("Invalid Email");
-                   editTextEmail.requestFocus();
-                   return;
-               }
-
-               if(!isValidPassword(password)) {
-                   editTextPassword.setError("Password must be at least 8 characters, include a capital letter and a number");
-                   editTextPassword.requestFocus();
-                   return;
-               }
-
-
-               mAuth.createUserWithEmailAndPassword(email, password)
-                       .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                           @Override
-                           public void onComplete(@NonNull Task<AuthResult> task) {
-                               if(task.isSuccessful()) {
-                                   Toast.makeText(SignUpActivity.this, "User has successfully signed up", Toast.LENGTH_LONG).show();
-                                   String userId = task.getResult().getUser().getUid();
-
-                                   User user = new User(fullName, email, userType);
-
-                                   usersRef.child(userId).setValue(user)
-                                           .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                               @Override
-                                                public void onSuccess(Void aVoid) {
-                                                   if(task.isSuccessful()) {
-                                                       Toast.makeText(SignUpActivity.this, "User profile created", Toast.LENGTH_LONG).show();
-
-                                                       Intent intent = new Intent(SignUpActivity.this, LogInActivity.class);
-                                                       startActivity(intent);
-                                                       finish();
-                                                   } else {
-                                                       Toast.makeText(SignUpActivity.this, "Failed to create user profile.", Toast.LENGTH_LONG).show();
-                                                   }
-                                               }
-                                           })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(SignUpActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                                                Log.e("SignUpError", "Failed to create user profile", e);
-                                            }
-                                        });
-                               } else {
-                                   if(task.getException() instanceof FirebaseAuthUserCollisionException) {
-                                       Toast.makeText(SignUpActivity.this, "User with this email already exists.", Toast.LENGTH_LONG).show();
-                                       editTextEmail.requestFocus();
-                                   } else {
-                                       Toast.makeText(SignUpActivity.this, "Failed to sign up: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                                   }
-                               }
-                           }
-                       });
-           }
-
-           private boolean isValidEmail(String email) {
-               return Patterns.EMAIL_ADDRESS.matcher(email).matches();
-           }
-
-           private boolean isValidPassword(String password) {
-               Pattern pattern = Pattern.compile("^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,}$");
-                return pattern.matcher(password).matches();
-           }
+                            // Write to Realtime Database
+                            dbRT.child(userId).setValue(newUser)
+                                    .addOnSuccessListener(aVoid -> Log.d("RealtimeDB", "User Realtime Database record created successfully for userID: " + userId))
+                                    .addOnFailureListener(e -> Log.e("RealtimeDB", "Error writing document to Realtime Database for userID: " + userId, e));
+                        } else {
+                            handleSignUpError(task);
+                        }
+                    });
         });
+    }
+
+    private boolean validateInputs(String fullName, String email, String password, String confirmPassword) {
+        if(fullName.isEmpty()) {
+            editTextFullName.setError("Full name is required");
+            editTextFullName.requestFocus();
+            return false;
+        }
+
+        if(email.isEmpty()) {
+            editTextEmail.setError("Email is required");
+            editTextEmail.requestFocus();
+            return false;
+        }
+
+        if(password.isEmpty()) {
+            editTextPassword.setError("Password is required");
+            editTextPassword.requestFocus();
+            return false;
+        }
+
+        if(!password.equals(confirmPassword)) {
+            editTextConfirmPassword.setError("Passwords do not match");
+            editTextConfirmPassword.requestFocus();
+            return false;
+        }
+
+        if(!isValidEmail(email)) {
+            editTextEmail.setError("Invalid Email");
+            editTextEmail.requestFocus();
+            return false;
+        }
+
+        if(!isValidPassword(password)) {
+            editTextPassword.setError("Password must be at least 8 characters, include a capital letter and a number");
+            editTextPassword.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isValidEmail(String email) {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    private boolean isValidPassword(String password) {
+        Pattern pattern = Pattern.compile("^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,}$");
+        return pattern.matcher(password).matches();
+    }
+
+    private void handleSignUpError(Task<AuthResult> task) {
+        if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+            Toast.makeText(this, "User with this email already exists.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Failed to sign up: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(SignUpActivity.this, LogInActivity.class);
+        startActivity(intent);
+        finish();
     }
 
 
