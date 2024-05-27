@@ -1,5 +1,6 @@
 package com.example.equationenigma.Quizzes;
 
+
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import com.example.equationenigma.QuizReport;
 import com.example.equationenigma.R;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -41,6 +43,9 @@ public class Quiz1 extends Fragment {
     private int secondsElapsed = 0;
     private Handler timerHandler = new Handler();
     private boolean timerRunning = false;
+    private static final String TAG = "Quiz 1";
+
+
     private Runnable timerRunnable = new Runnable() {
         @Override
         public void run() {
@@ -176,11 +181,16 @@ public class Quiz1 extends Fragment {
     }
 
     private void generateAndSaveReport() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        String userId = (auth.getCurrentUser() != null) ? auth.getCurrentUser().getUid() : null;
-        if (userId == null) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Log.d(TAG, "User is not logged in");
             Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        String currentUserName = user.getDisplayName();
+        if (currentUserName == null || currentUserName.isEmpty()) {
+            currentUserName = "Unknown User"; // Consider changing this to user.getEmail() or just using user.getUid()
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
@@ -193,17 +203,17 @@ public class Quiz1 extends Fragment {
         }
 
         Map<String, Object> reportData = new HashMap<>();
-        reportData.put("userId", userId); // Ensure this key matches the one expected in Firestore rules
+        reportData.put("userName", currentUserName); // Make sure this is consistent with how you fetch data in ReportFragment
+        reportData.put("userId", user.getUid());
         reportData.put("reportName", reportName);
         reportData.put("mistakes", mistakes);
         reportData.put("timeTaken", timeTaken);
         reportData.put("detailedResults", detailedResults);
 
-        Log.d("Quiz 1", "Preparing to save report with data: " + reportData);
+        Log.d(TAG, "Preparing to save report with data: " + reportData.toString());
 
         saveReportToFirebase(reportData);
     }
-
 
     private boolean checkMatch(int functionIndex, int graphIndex) {
         // Correct match if indices are the same
@@ -228,6 +238,7 @@ public class Quiz1 extends Fragment {
         db.collection("quizReports")
                 .add(reportData)
                 .addOnSuccessListener(documentReference -> {
+                    Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
                     if (isAdded()) {  // Check if the fragment is currently added to its activity
                         Toast.makeText(getContext(), "Report saved!", Toast.LENGTH_SHORT).show();
                     }

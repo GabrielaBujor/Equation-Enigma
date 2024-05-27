@@ -28,19 +28,29 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
     @Override
     public void onBindViewHolder(@NonNull ReportViewHolder holder, int position) {
         QuizReport report = reports.get(position);
-        holder.reportNameTextView.setText(report.getReportName());
-        holder.mistakesTextView.setText("Mistakes: " + report.getMistakes());
-        holder.timeTakenTextView.setText("Time: " + report.getTimeTaken());
+        if (report != null) {
+            holder.reportNameTextView.setText(report.getReportName() != null ? report.getReportName() : "N/A");
+            holder.mistakesTextView.setText("Mistakes: " + report.getMistakes());
+            holder.timeTakenTextView.setText("Time: " + report.getTimeTaken());
 
-        StringBuilder detailsBuilder = new StringBuilder();
-        for (Map.Entry<String, Boolean> entry : report.getDetailedResults().entrySet()) {
-            detailsBuilder.append(entry.getKey())
-                    .append(": ")
-                    .append(entry.getValue() ? "Correct" : "Incorrect")
-                    .append("\n");
+            StringBuilder detailsBuilder = new StringBuilder();
+            if (report.getDetailedResults() != null) {
+                for (Map.Entry<String, Boolean> entry : report.getDetailedResults().entrySet()) {
+                    detailsBuilder.append(entry.getKey())
+                            .append(": ")
+                            .append(entry.getValue() ? "Correct" : "Incorrect")
+                            .append("\n");
+                }
+            }
+            holder.detailsTextView.setText(detailsBuilder.toString());
+        } else {
+            holder.reportNameTextView.setText("Report data not available");
+            holder.mistakesTextView.setText("Mistakes: N/A");
+            holder.timeTakenTextView.setText("Time: N/A");
+            holder.detailsTextView.setText("Details not available");
         }
-        holder.detailsTextView.setText(detailsBuilder.toString());
     }
+
 
 
     @Override

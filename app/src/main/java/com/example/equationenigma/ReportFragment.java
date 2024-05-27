@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,9 @@ public class ReportFragment extends Fragment {
     private ReportAdapter reportAdapter;
     private List<QuizReport> reports = new ArrayList<>();
     private EditText searchInput;
+
+    private static final String TAG = "ReportFragment";
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -98,6 +102,7 @@ public class ReportFragment extends Fragment {
 
     private void loadReportsForUser(String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Log.d(TAG, "Loading reports for user ID: " + userId);
         db.collection("quizReports")
                 .whereEqualTo("userId", userId)
                 .get()
@@ -109,11 +114,20 @@ public class ReportFragment extends Fragment {
                             reports.add(report);
                         }
                         reportAdapter.notifyDataSetChanged();
+                        Log.d(TAG, "Number of reports fetched: " + reports.size());  // Log the count here
+
+                        if (reports.isEmpty()) {
+                            Toast.makeText(getContext(), "No reports found.", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        Toast.makeText(getContext(), "Error getting reports: " + task.getException(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Error getting reports: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error getting reports: " + task.getException().getMessage());
                     }
                 });
     }
+
+
+
 
     private void searchStudentsReports(String studentName) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();

@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -40,6 +41,8 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private DatabaseReference dbRT;
+    private static final String TAG = "SignUp";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +75,8 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void setupSignUpButton() {
         buttonSignUp.setOnClickListener(v -> {
+            Log.d(TAG, "Sign Up button clicked");
+
             String fullName = editTextFullName.getText().toString().trim();
             String email = editTextEmail.getText().toString().trim();
             String password = editTextPassword.getText().toString().trim();
@@ -84,27 +89,46 @@ public class SignUpActivity extends AppCompatActivity {
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
-                            String userId = mAuth.getCurrentUser().getUid();
+                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                            if (firebaseUser == null) {
+                                Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            String userId = firebaseUser.getUid();
                             User newUser = new User(fullName, email, userType);
 
-                            // Write to Firestore
-                            db.collection("Users").document(userId).set(newUser)
-                                    .addOnSuccessListener(aVoid -> {
-                                        Log.d("Firestore", "User Firestore record created successfully for userID: " + userId);
-                                        navigateToLogin();
-                                    })
-                                    .addOnFailureListener(e -> Log.e("Firestore", "Error writing document for userID: " + userId, e));
-
-                            // Write to Realtime Database
-                            dbRT.child(userId).setValue(newUser)
-                                    .addOnSuccessListener(aVoid -> Log.d("RealtimeDB", "User Realtime Database record created successfully for userID: " + userId))
-                                    .addOnFailureListener(e -> Log.e("RealtimeDB", "Error writing document to Realtime Database for userID: " + userId, e));
+                            // Proceed with writing user data to Firestore and Realtime Database
+                            writeUserDataToDatabases(newUser, userId);
                         } else {
-                            handleSignUpError(task);
+                            Log.e(TAG, "Signup failed", task.getException());
+                            Toast.makeText(SignUpActivity.this, "Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         }
                     });
         });
     }
+
+    private void writeUserDataToDatabases(User user, String userId) {
+        // Firestore
+        db.collection("Users").document(userId).set(user)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firestore", "User Firestore record created successfully for userID: " + userId);
+                    // Realtime Database
+                    dbRT.child(userId).setValue(user)
+                            .addOnSuccessListener(aVoidRT -> {
+                                Log.d("RealtimeDB", "User Realtime Database record created successfully for userID: " + userId);
+                                navigateToLogin();
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("RealtimeDB", "Error writing document to Realtime Database for userID: " + userId, e);
+                                Toast.makeText(SignUpActivity.this, "Failed to write user data to Realtime Database.", Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error writing document for userID: " + userId, e);
+                    Toast.makeText(SignUpActivity.this, "Failed to write user data to Firestore.", Toast.LENGTH_SHORT).show();
+                });
+    }
+
 
     private boolean validateInputs(String fullName, String email, String password, String confirmPassword) {
         if(fullName.isEmpty()) {
