@@ -190,6 +190,7 @@ public class Quiz1 extends Fragment {
 
         String currentUserName = user.getDisplayName();
         if (currentUserName == null || currentUserName.isEmpty()) {
+            Log.d(TAG, "User name is not set or empty");
             currentUserName = "Unknown User"; // Consider changing this to user.getEmail() or just using user.getUid()
         }
 
@@ -210,6 +211,7 @@ public class Quiz1 extends Fragment {
         reportData.put("timeTaken", timeTaken);
         reportData.put("detailedResults", detailedResults);
 
+        Log.d(TAG, "Attempting to save report for user: " + currentUserName);
         Log.d(TAG, "Preparing to save report with data: " + reportData.toString());
 
         saveReportToFirebase(reportData);

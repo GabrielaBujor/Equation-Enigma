@@ -7,7 +7,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +28,7 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
     public void onBindViewHolder(@NonNull ReportViewHolder holder, int position) {
         QuizReport report = reports.get(position);
         if (report != null) {
+            holder.userNameTextView.setText(report.getUserName() != null ? report.getUserName() : "Unknown User");
             holder.reportNameTextView.setText(report.getReportName() != null ? report.getReportName() : "N/A");
             holder.mistakesTextView.setText("Mistakes: " + report.getMistakes());
             holder.timeTakenTextView.setText("Time: " + report.getTimeTaken());
@@ -44,6 +44,7 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
             }
             holder.detailsTextView.setText(detailsBuilder.toString());
         } else {
+            holder.userNameTextView.setText("User name not available");
             holder.reportNameTextView.setText("Report data not available");
             holder.mistakesTextView.setText("Mistakes: N/A");
             holder.timeTakenTextView.setText("Time: N/A");
@@ -63,13 +64,15 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
         TextView mistakesTextView;
         TextView timeTakenTextView;
         TextView detailsTextView; // TextView to show detailed results
+        TextView userNameTextView;
 
         ReportViewHolder(View itemView) {
             super(itemView);
             reportNameTextView = itemView.findViewById(R.id.reportNameTextView);
             mistakesTextView = itemView.findViewById(R.id.mistakesTextView);
             timeTakenTextView = itemView.findViewById(R.id.timeTakenTextView);
-            detailsTextView = itemView.findViewById(R.id.detailsTextView); // Make sure this ID exists in item_report.xml
+            detailsTextView = itemView.findViewById(R.id.detailsTextView);
+            userNameTextView = itemView.findViewById(R.id.userNameTextView);
         }
     }
 }

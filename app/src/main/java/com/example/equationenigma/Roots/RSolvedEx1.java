@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 
@@ -41,6 +43,7 @@ public class RSolvedEx1 extends Fragment {
 
     private ImageView imageViewGraph;
     private Button HomeButton;
+    private ProgressBar progressBar;
 
     public RSolvedEx1() {
         // Required empty public constructor
@@ -70,7 +73,9 @@ public class RSolvedEx1 extends Fragment {
 
         imageViewGraph = view.findViewById(R.id.imageViewGraph);
         HomeButton = view.findViewById(R.id.homeButton);
+        progressBar = view.findViewById(R.id.progressBar);
 
+        progressBar.setVisibility(View.VISIBLE);
 
         // Fetch the document from Firestore
         fetchExerciseData();
@@ -103,11 +108,23 @@ public class RSolvedEx1 extends Fragment {
                 Picasso.get().load(uri.toString())
                         .placeholder(R.drawable.loading)  // Placeholder image
                         .error(R.drawable.error)        // Error image
-                        .into(imageView);
+                        .into(imageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                progressBar.setVisibility(View.GONE);
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                progressBar.setVisibility(View.GONE);
+                                Log.e("PicassoError", "Error loading image", e);
+                            }
+                        });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
+                progressBar.setVisibility(View.GONE);
                 imageView.setImageResource(R.drawable.error);  // Fallback image on failure
                 Log.e("FirebaseStorage", "Error getting image", exception);
             }
@@ -137,11 +154,14 @@ public class RSolvedEx1 extends Fragment {
                         if (graphPath != null && !graphPath.isEmpty()) {
                             fetchAndDisplayImage(imageViewGraph, graphPath);
                         } else {
+                            progressBar.setVisibility(View.GONE);
                             Log.e("DataError", "No path for the image available");
                         }
                     }
+                    progressBar.setVisibility(View.GONE);
                 })
                 .addOnFailureListener(e -> {
+                    progressBar.setVisibility(View.GONE);
                     // Log the error
                     Log.e("FirestoreError", "Error fetching document", e);
 

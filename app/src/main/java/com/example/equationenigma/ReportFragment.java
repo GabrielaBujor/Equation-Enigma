@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +41,9 @@ public class ReportFragment extends Fragment {
     private ReportAdapter reportAdapter;
     private List<QuizReport> reports = new ArrayList<>();
     private EditText searchInput;
+    private Button searchButton;
+    private ProgressBar progressBar;
+
 
     private static final String TAG = "ReportFragment";
 
@@ -58,21 +62,11 @@ public class ReportFragment extends Fragment {
         reportsRecyclerView.setAdapter(reportAdapter);
 
         searchInput = rootView.findViewById(R.id.searchInput);
-        Button searchButton = rootView.findViewById(R.id.searchButton);
+        searchButton = rootView.findViewById(R.id.searchButton);
+        progressBar = rootView.findViewById(R.id.progressBar);
 
         // Determine the user type and load data accordingly
         determineUserTypeAndLoadReports();
-
-        // Setup search button click listener for teachers
-        searchButton.setOnClickListener(v -> {
-            String searchText = searchInput.getText().toString().trim();
-            if (!TextUtils.isEmpty(searchText)) {
-                searchStudentsReports(searchText);
-            } else {
-                Toast.makeText(getContext(), "Please enter a student name to search.", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         return rootView;
     }
 
@@ -80,22 +74,39 @@ public class ReportFragment extends Fragment {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users").child(auth.getUid());
 
+        progressBar.setVisibility(View.VISIBLE);
+
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String userType = dataSnapshot.child("userType").getValue(String.class);
                 if ("Teacher".equals(userType)) {
-                    // Allow teachers to search
-                    searchInput.setEnabled(true);
+                    searchInput.setVisibility(View.VISIBLE);
+                    searchButton.setVisibility(View.VISIBLE);
+                    loadReportsForUser(auth.getUid());
+                    setupSearchButton();
                 } else {
-                    // Load only the logged-in student's reports
+                    searchInput.setVisibility(View.GONE);
+                    searchButton.setVisibility(View.GONE);
                     loadReportsForUser(auth.getUid());
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(getContext(), "Failed to load user data: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setupSearchButton() {
+        searchButton.setOnClickListener(v -> {
+            String searchText = searchInput.getText().toString().trim();
+            if(!searchText.isEmpty()) {
+                searchStudentsReports(searchText);
+            } else {
+                Toast.makeText(getContext(), "Please enter a student name to search", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -103,18 +114,21 @@ public class ReportFragment extends Fragment {
     private void loadReportsForUser(String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Log.d(TAG, "Loading reports for user ID: " + userId);
+
+        progressBar.setVisibility(View.VISIBLE);
+
         db.collection("quizReports")
                 .whereEqualTo("userId", userId)
                 .get()
                 .addOnCompleteListener(task -> {
+                    progressBar.setVisibility(View.GONE);
                     if (task.isSuccessful()) {
                         reports.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            QuizReport report = document.toObject(QuizReport.class);
-                            reports.add(report);
+                            reports.add(document.toObject(QuizReport.class));
                         }
                         reportAdapter.notifyDataSetChanged();
-                        Log.d(TAG, "Number of reports fetched: " + reports.size());  // Log the count here
+                        Log.d(TAG, "Number of reports fetched: " + reports.size());
 
                         if (reports.isEmpty()) {
                             Toast.makeText(getContext(), "No reports found.", Toast.LENGTH_SHORT).show();
@@ -126,28 +140,29 @@ public class ReportFragment extends Fragment {
                 });
     }
 
-
-
-
     private void searchStudentsReports(String studentName) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        // Search based on a 'name' field in reports - adjust if using a different field
+
+        progressBar.setVisibility(View.VISIBLE);
+
         db.collection("quizReports")
-                .whereEqualTo("studentName", studentName)
+                .whereEqualTo("userName", studentName)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         reports.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            QuizReport report = document.toObject(QuizReport.class);
-                            reports.add(report);
+                            reports.add(document.toObject(QuizReport.class));
                         }
                         reportAdapter.notifyDataSetChanged();
+                        Log.d(TAG, "Number of reports fetched: " + reports.size());
+
                         if (reports.isEmpty()) {
                             Toast.makeText(getContext(), "No reports found for that student.", Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         Toast.makeText(getContext(), "Error searching reports: " + task.getException(), Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error getting reports: " + task.getException().getMessage());
                     }
                 });
     }

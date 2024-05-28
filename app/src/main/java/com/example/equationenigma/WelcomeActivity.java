@@ -49,10 +49,8 @@ public class WelcomeActivity extends AppCompatActivity {
                 if(current < total - 1) {
                     viewPager2.setCurrentItem(current + 1, true);
                 } else {
-                    Intent intent = new Intent(WelcomeActivity.this, LogInActivity.class);
-                    startActivity(intent);
-
-                    finish();
+                    markWelcomeScreenShown();
+                    navigateToLogin();
                 }
             }
         });
@@ -60,15 +58,8 @@ public class WelcomeActivity extends AppCompatActivity {
         buttonSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences prefs = getSharedPreferences("EquationEnigmaPrefs", MODE_PRIVATE);
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putBoolean("welcomeShown", true);
-                editor.apply();
-
-                Intent intent = new Intent(WelcomeActivity.this, LogInActivity.class);
-                startActivity(intent);
-
-                finish();
+                markWelcomeScreenShown();
+                navigateToLogin();
             }
         });
 
@@ -83,5 +74,18 @@ public class WelcomeActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void markWelcomeScreenShown() {
+        SharedPreferences prefs = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("welcomeShown", true);
+        editor.apply();
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(WelcomeActivity.this, LogInActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

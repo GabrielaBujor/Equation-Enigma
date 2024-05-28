@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class LogInActivity extends AppCompatActivity {
@@ -33,10 +34,24 @@ public class LogInActivity extends AppCompatActivity {
     private Button signUpButton;
     private CheckBox rememberMeCheckBox;
     private FirebaseAuth mAuth;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Check if the welcome screen has been shown before
+        prefs = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
+        boolean welcomeShown = prefs.getBoolean("welcomeShown", false);
+
+        if (!welcomeShown) {
+            // If not shown, redirect to WelcomeActivity
+            Intent intent = new Intent(LogInActivity.this, WelcomeActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_login);
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -49,10 +64,13 @@ public class LogInActivity extends AppCompatActivity {
         signUpButton = findViewById(R.id.sign_up_button);
         rememberMeCheckBox = findViewById(R.id.checkbox_remember_me);
 
-        SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS_FILE, MODE_PRIVATE);
         boolean isRemembered = prefs.getBoolean("Remember Me", false);
         if(isRemembered) {
-            startMainActivity();
+            String savedEmail = prefs.getString("Username", "");
+            String savedPassword = prefs.getString("Password", "");
+            emailEditText.setText(savedEmail);
+            passwordEditText.setText(savedPassword);
+            rememberMeCheckBox.setChecked(true);
         }
 
         logInButton.setOnClickListener(new View.OnClickListener() {
@@ -72,9 +90,7 @@ public class LogInActivity extends AppCompatActivity {
                     passwordEditText.requestFocus();
                     return;
                 }
-
                 loginUser(email, password);
-
             }
 
             private void loginUser(String email, String password) {
@@ -85,21 +101,27 @@ public class LogInActivity extends AppCompatActivity {
                                 if(task.isSuccessful()) {
                                     Log.d("Login", "signInWithEmail:success");
 
-                                    if(rememberMeCheckBox.isChecked()) {
-                                        prefs.edit()
-                                                .putBoolean("RememberMe", true)
-                                                .putString("Username", email)
-                                                .putString("Password", password)
-                                                .apply();
+                                    SharedPreferences.Editor editor = prefs.edit();
+                                    if (rememberMeCheckBox.isChecked()) {
+                                        editor.putBoolean("RememberMe", true);
+                                        editor.putString("Username", email);
+                                        editor.putString("Password", password);
                                     } else {
-                                        prefs.edit().putBoolean("RememberMe", false).apply();
+                                        editor.putBoolean("RememberMe", false);
+                                        editor.remove("Username");
+                                        editor.remove("Password");
                                     }
+                                    editor.apply();
+
+                                    Toast.makeText(LogInActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
                                     startMainActivity();
                                     } else {
                                         if(task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                             Toast.makeText(LogInActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
                                         } else if (task.getException() instanceof FirebaseAuthInvalidUserException) {
                                             Toast.makeText(LogInActivity.this, "User does not exist", Toast.LENGTH_SHORT).show();
+                                        } else if (task.getException() instanceof IOException) {
+                                            Toast.makeText(LogInActivity.this, "Network connection error. Please check your internet connection and try again.", Toast.LENGTH_SHORT).show();
                                         } else {
                                             //Log.w("Login", "signInWithEmail:failure", task.getException());
                                             Toast.makeText(LogInActivity.this, "Authentication failed", Toast.LENGTH_SHORT).show();
@@ -130,10 +152,6 @@ public class LogInActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
-
-    private boolean validateCredentials(String email, String password) {
-        return true;
     }
 
     private void startMainActivity() {
