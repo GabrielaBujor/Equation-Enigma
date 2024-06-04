@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -39,7 +40,7 @@ public class Quiz3 extends Fragment {
     private final TextView[] functionViews = new TextView[4];
     private final int[] matchedWith = new int[4]; // Store the index of the graph each function is matched with
     private int selectedFunctionIndex = -1; // -1 indicates no function is selected
-
+    private boolean[] isFunctionMatched;
     private int secondsElapsed = 0;
     private Handler timerHandler = new Handler();
     private boolean timerRunning = false;
@@ -75,6 +76,8 @@ public class Quiz3 extends Fragment {
 
         // Initialize matchedWith array with -1 indicating no matches
         java.util.Arrays.fill(matchedWith, -1);
+        isFunctionMatched = new boolean[functionViews.length];
+        Arrays.fill(isFunctionMatched, false);  // Initially, no functions are matched
 
         // Start the timer
         startTimer();
@@ -119,7 +122,11 @@ public class Quiz3 extends Fragment {
     private void onFunctionSelected(int index) {
         // Highlight the selected function
         for (int i = 0; i < functionViews.length; i++) {
-            functionViews[i].setBackgroundColor(i == index ? Color.LTGRAY : Color.TRANSPARENT);
+            if(matchStatus[i] == true) {
+                functionViews[i].setBackgroundColor(Color.LTGRAY);
+            } else {
+                functionViews[i].setBackgroundColor(i == index ? Color.LTGRAY : Color.TRANSPARENT);
+            }
         }
         selectedFunctionIndex = index;
     }
@@ -151,14 +158,22 @@ public class Quiz3 extends Fragment {
 
     private void updateUIAfterMatch(int graphIndex, boolean isMatchCorrect) {
         graphViews[graphIndex].setColorFilter(isMatchCorrect ? Color.GREEN : Color.RED, PorterDuff.Mode.MULTIPLY);
-        functionViews[selectedFunctionIndex].setBackgroundColor(isMatchCorrect ? Color.LTGRAY : Color.RED);
+        // Always set the function background to gray if matched, regardless of correctness
+        functionViews[selectedFunctionIndex].setBackgroundColor(Color.LTGRAY);
         functionViews[selectedFunctionIndex].setClickable(false);
         graphViews[graphIndex].setClickable(false);
+
+        // Mark the function as matched
+        isFunctionMatched[selectedFunctionIndex] = true;
     }
 
+
     private void resetFunctionSelections() {
-        for (TextView functionView : functionViews) {
-            functionView.setBackgroundColor(Color.TRANSPARENT);
+        for (int i = 0; i < functionViews.length; i++) {
+            // Only reset the background color if the function has not been matched
+            if (!isFunctionMatched[i]) {
+                functionViews[i].setBackgroundColor(Color.TRANSPARENT);
+            }
         }
     }
 
@@ -190,6 +205,7 @@ public class Quiz3 extends Fragment {
 
         String currentUserName = user.getDisplayName();
         if (currentUserName == null || currentUserName.isEmpty()) {
+            Log.d(TAG, "User name is not set or empty");
             currentUserName = "Unknown User"; // Consider changing this to user.getEmail() or just using user.getUid()
         }
 
@@ -210,12 +226,11 @@ public class Quiz3 extends Fragment {
         reportData.put("timeTaken", timeTaken);
         reportData.put("detailedResults", detailedResults);
 
+        Log.d(TAG, "Attempting to save report for user: " + currentUserName);
         Log.d(TAG, "Preparing to save report with data: " + reportData.toString());
 
         saveReportToFirebase(reportData);
     }
-
-
 
     private boolean checkMatch(int functionIndex, int graphIndex) {
         // Correct match if indices are the same

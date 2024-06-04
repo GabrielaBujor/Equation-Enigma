@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -140,13 +141,13 @@ public class RSolvedEx1 extends Fragment {
                         // Set the text from Firestore to the TextViews
                         textViewTitle.setText(documentSnapshot.getString("title"));
                         textViewFunction.setText(documentSnapshot.getString("function"));
-                        textViewParity.setText(documentSnapshot.getString("parity"));
-                        textViewIntersection.setText(documentSnapshot.getString("intersection"));
-                        textViewBorders.setText(documentSnapshot.getString("borders"));
-                        textViewExtremePoints.setText(documentSnapshot.getString("extremePoints"));
-                        textViewMonotonicity.setText(documentSnapshot.getString("monotony"));
-                        textViewBijectivity.setText(documentSnapshot.getString("bijectivity"));
-                        textViewConvexity.setText(documentSnapshot.getString("convexity"));
+                        textViewParity.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("parity")));
+                        textViewIntersection.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("intersection")));
+                        textViewBorders.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("borders")));
+                        textViewExtremePoints.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("extremePoints")));
+                        textViewMonotonicity.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("monotony")));
+                        textViewBijectivity.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("bijectivity")));
+                        textViewConvexity.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("convexity")));
 
 
                         // Load the graph image

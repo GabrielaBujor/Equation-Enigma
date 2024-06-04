@@ -69,7 +69,7 @@
                 android:id="@+id/function3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="f(x) = log((1)/(2)) x"
+                android:text="f(x) = log0.5 (x)"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:layout_marginBottom="16dp"/>

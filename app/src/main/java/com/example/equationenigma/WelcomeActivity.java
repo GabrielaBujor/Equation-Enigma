@@ -77,7 +77,7 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void markWelcomeScreenShown() {
-        SharedPreferences prefs = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS_FILE, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("welcomeShown", true);
         editor.apply();

@@ -41,7 +41,7 @@ public class LogInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Check if the welcome screen has been shown before
-        prefs = getSharedPreferences("MyAppPreferences", MODE_PRIVATE);
+        prefs = getSharedPreferences(Constants.SHARED_PREFS_FILE, MODE_PRIVATE);
         boolean welcomeShown = prefs.getBoolean("welcomeShown", false);
 
         if (!welcomeShown) {
