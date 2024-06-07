@@ -7,8 +7,6 @@
     tools:context=".UserProfileFragment"
     android:background="@drawable/background">
 
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,7 +20,8 @@
             android:text="User Profile"
             android:textSize="30dp"
             android:textColor="@color/black"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/playfairdisplay_black"/>
 
         <!-- Profile Image -->
         <ImageView
@@ -49,7 +48,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Full Name"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:fontFamily="@font/playfairdisplay_regular"/>
 
             <TextView
                 android:id="@+id/text_full_name"
@@ -58,7 +58,8 @@
                 android:layout_weight="2"
                 android:text="name"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:gravity="end"/>
+                android:gravity="end"
+                android:fontFamily="@font/playfairdisplay_regular"/>
         </LinearLayout>
 
         <!-- Email Row -->
@@ -76,7 +77,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="E-mail"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:fontFamily="@font/playfairdisplay_regular"/>
 
             <TextView
                 android:id="@+id/text_email"
@@ -85,7 +87,8 @@
                 android:layout_weight="2"
                 android:text="email"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:gravity="end"/>
+                android:gravity="end"
+                android:fontFamily="@font/playfairdisplay_regular"/>
         </LinearLayout>
 
         <!-- User Type Spinner -->
@@ -103,7 +106,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="User Type"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:fontFamily="@font/playfairdisplay_regular"/>
 
             <TextView
                 android:id="@+id/text_user_type"
@@ -112,7 +116,8 @@
                 android:layout_weight="2"
                 android:text="user type"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:gravity="end"/>
+                android:gravity="end"
+                android:fontFamily="@font/playfairdisplay_regular"/>
         </LinearLayout>
 
 

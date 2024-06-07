@@ -12,7 +12,7 @@
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@drawable/background"
+        android:background="#F8D591"
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
@@ -23,7 +23,8 @@
         android:text="Edit profile"
         android:textSize="30dp"
         android:textColor="@color/black"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/playfairdisplay_black"/>
 
     <EditText
         android:id="@+id/editTextName"
@@ -32,7 +33,8 @@
         android:hint="Enter new name"
         android:inputType="textPersonName"
         android:layout_marginTop="50dp"
-        android:minHeight="48dp" />
+        android:minHeight="48dp"
+        android:fontFamily="@font/playfairdisplay_regular"/>
 
     <ImageView
         android:id="@+id/imageViewProfile"

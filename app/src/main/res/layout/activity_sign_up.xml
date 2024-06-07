@@ -44,7 +44,8 @@
             android:hint="Full Name"
             android:inputType="textPersonName"
             android:minHeight="48dp"
-            android:textColorHint="#212121" />
+            android:textColorHint="#212121"
+            android:fontFamily="@font/playfairdisplay_regular"/>
 
         <EditText
             android:id="@+id/editTextEmail"
@@ -55,7 +56,8 @@
             android:hint="Email"
             android:inputType="textEmailAddress"
             android:minHeight="48dp"
-            android:textColorHint="#212121" />
+            android:textColorHint="#212121"
+            android:fontFamily="@font/playfairdisplay_regular"/>
 
         <TextView
             android:id="@+id/textView3"
@@ -78,7 +80,8 @@
             android:hint="Password"
             android:inputType="textPassword"
             android:minHeight="48dp"
-            android:textColorHint="#212121" />
+            android:textColorHint="#212121"
+            android:fontFamily="@font/playfairdisplay_regular"/>
 
         <EditText
             android:id="@+id/editTextConfirmPassword"
@@ -89,7 +92,8 @@
             android:hint="Confirm password"
             android:inputType="textPassword"
             android:minHeight="48dp"
-            android:textColorHint="#212121" />
+            android:textColorHint="#212121"
+            android:fontFamily="@font/playfairdisplay_regular"/>
 
         <Spinner
             android:id="@+id/spinnerUserType"

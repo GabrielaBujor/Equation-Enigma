@@ -52,7 +52,8 @@
         android:hint="Email"
         android:inputType="textEmailAddress"
         android:maxLines="1"
-        android:minHeight="48dp" />
+        android:minHeight="48dp"
+        android:fontFamily="@font/playfairdisplay_regular"/>
 
     <EditText
         android:id="@+id/password"
@@ -63,7 +64,8 @@
         android:hint="Password"
         android:inputType="textPassword"
         android:maxLines="1"
-        android:minHeight="48dp" />
+        android:minHeight="48dp"
+        android:fontFamily="@font/playfairdisplay_regular"/>
 
     <CheckBox
         android:id="@+id/checkbox_remember_me"
@@ -74,7 +76,8 @@
         android:layout_marginBottom="16dp"
         android:minHeight="48dp"
         android:text="Remember Me"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:fontFamily="@font/playfairdisplay_regular"/>
 
     <Button
         android:id="@+id/log_in_button"

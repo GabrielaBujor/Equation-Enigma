@@ -49,7 +49,10 @@ public class ESolvedEx1 extends Fragment {
         // Required empty public constructor
     }
 
-
+    public static ESolvedEx1 createInstance() {
+        ESolvedEx1 fragment = new ESolvedEx1();
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

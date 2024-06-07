@@ -3,12 +3,310 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Exponential.EEx1">
+    tools:context=".Exponential.EEx1"
+    android:background="@drawable/background">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/textViewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textViewFunction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"/>
+
+            <TextView
+                android:id="@+id/textViewInverseF"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:fontFamily="@font/playfairdisplay_italic"
+                    android:text="Is the function even?"/>
+
+                <EditText
+                    android:id="@+id/editTextEven"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="yes / no"
+                    android:textSize="22sp"
+                    android:layout_marginLeft="10dp"
+                    android:fontFamily="@font/playfairdisplay_regular"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:fontFamily="@font/playfairdisplay_italic"
+                    android:text="Is the function odd?"/>
+
+                <EditText
+                    android:id="@+id/editTextOdd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="yes / no"
+                    android:textSize="22sp"
+                    android:layout_marginLeft="10dp"
+                    android:fontFamily="@font/playfairdisplay_regular"
+                    />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:fontFamily="@font/playfairdisplay_regular"
+                android:text="Now let's calculate f(0) to find out the intersection point"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:fontFamily="@font/playfairdisplay_regular"
+                    android:text="f(0) = "/>
+
+                <EditText
+                    android:id="@+id/editTextF0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:layout_marginLeft="10dp"
+                    android:hint="value"
+                    android:fontFamily="@font/playfairdisplay_regular"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:fontFamily="@font/playfairdisplay_regular"
+                    android:text="So f(x) intersects "/>
+
+                <EditText
+                    android:id="@+id/editTextIntersection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:hint="Ox / Oy in A(x, y)"
+                    android:layout_marginLeft="10dp"
+                    android:fontFamily="@font/playfairdisplay_regular"
+                    />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:fontFamily="@font/playfairdisplay_regular"
+                android:text="Now we will find if it has any bounds"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="22sp"
+                        android:fontFamily="@font/playfairdisplay_regular"
+                        android:text="f(1) = "/>
+
+                    <EditText
+                        android:id="@+id/editTextF1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="22sp"
+                        android:hint="value"
+                        android:layout_marginLeft="10dp"
+                        android:fontFamily="@font/playfairdisplay_regular"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="22sp"
+                        android:fontFamily="@font/playfairdisplay_regular"
+                        android:text="f(-1) = "/>
+
+                    <EditText
+                        android:id="@+id/editTextFMinus1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="22sp"
+                        android:hint="value"
+                        android:layout_marginLeft="10dp"
+                        android:fontFamily="@font/playfairdisplay_regular"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:fontFamily="@font/playfairdisplay_regular"
+                    android:text="f has a "/>
+                <EditText
+                    android:id="@+id/editTextBound"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:hint="lower / upper bound"
+                    android:layout_marginLeft="10dp"
+                    android:fontFamily="@font/playfairdisplay_regular"/>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textViewExtremePoints"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:fontFamily="@font/playfairdisplay_regular"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:fontFamily="@font/playfairdisplay_regular"
+                    android:text="f is monotone and it is "/>
+                <EditText
+                    android:id="@+id/editTextMonotonicity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:hint="increasing / decreasing"
+                    android:layout_marginLeft="10dp"
+                    android:fontFamily="@font/playfairdisplay_regular"/>
+            </LinearLayout>
+
+<!--            <Button-->
+<!--                android:id="@+id/buttonHint"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="?"-->
+<!--                android:visibility="visible"-->
+<!--                android:onClick="showHint"/>-->
+
+            <TextView
+                android:id="@+id/textViewMonotonicityHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:fontFamily="@font/playfairdisplay_regular"/>
+
+            <TextView
+                android:id="@+id/textViewBijectivity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"/>
+
+            <TextView
+                android:id="@+id/textViewConvexity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"/>
+
+            <Button
+                android:id="@+id/buttonVerify"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Verify"
+                android:background="@drawable/rounded_button"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="35dp"/>
+
+            <ImageView
+                android:id="@+id/imageViewGraph"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:contentDescription="Graph"
+                android:scaleType="fitCenter"
+                android:visibility="gone"
+                android:layout_marginTop="16dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
 
 </FrameLayout>
