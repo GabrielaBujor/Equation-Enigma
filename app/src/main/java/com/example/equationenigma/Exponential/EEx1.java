@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -34,6 +35,7 @@ public class EEx1 extends Fragment {
     private Button buttonVerify;
     private ImageView imageViewGraph;
     private ProgressBar progressBar;
+    private ImageButton hintButton;
 
     private Map<String, String> correctAnswers = new HashMap<>();
 
@@ -65,6 +67,18 @@ public class EEx1 extends Fragment {
         buttonVerify = view.findViewById(R.id.buttonVerify);
         imageViewGraph = view.findViewById(R.id.imageViewGraph);
         progressBar = view.findViewById(R.id.progressBar);
+        hintButton = view.findViewById(R.id.hintButton);
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        hintButton.setOnClickListener(v -> {
+            // Toggle the visibility of the hint text view
+            if (textViewMonotonicityHint.getVisibility() == View.GONE) {
+                textViewMonotonicityHint.setVisibility(View.VISIBLE);
+            } else {
+                textViewMonotonicityHint.setVisibility(View.GONE);
+            }
+        });
 
         fetchExerciseData();
 
@@ -86,7 +100,9 @@ public class EEx1 extends Fragment {
                         textViewExtremePoints.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("extremePoints")));
                         textViewBijectivity.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("bijectivity")));
                         textViewConvexity.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("convexity")));
-                        textViewMonotonicityHint.setText(documentSnapshot.getString("monotonicityHint"));
+                        String hint = documentSnapshot.getString("monotonicityHint");
+                        textViewMonotonicityHint = getView().findViewById(R.id.textViewMonotonicityHint);
+                        textViewMonotonicityHint.setText(hint);
 
                         String graphURL = documentSnapshot.getString("graphURL");  // Get the image URL from Firestore
 
@@ -115,45 +131,19 @@ public class EEx1 extends Fragment {
         boolean allCorrect = true;
         progressBar.setVisibility(View.VISIBLE);
 
-        // Check each answer
-        if (!editTextEven.getText().toString().equalsIgnoreCase(correctAnswers.get("even"))) {
-            allCorrect = false;
-            editTextEven.setError("Incorrect answer");  // Set error on the EditText if wrong
-        }
-        if (!editTextOdd.getText().toString().equalsIgnoreCase(correctAnswers.get("odd"))) {
-            allCorrect = false;
-            editTextOdd.setError("Incorrect answer");  // Set error on the EditText if wrong
-        }
-        if (!editTextF0.getText().toString().equalsIgnoreCase(correctAnswers.get("f(0)"))) {
-            allCorrect = false;
-            editTextF0.setError("Incorrect answer");  // Set error on the EditText if wrong
-        }
-        if (!editTextIntersection.getText().toString().equalsIgnoreCase(correctAnswers.get("intersection"))) {
-            allCorrect = false;
-            editTextIntersection.setError("Incorrect answer");  // Set error on the EditText if wrong
-        }
-        if (!editTextF1.getText().toString().equalsIgnoreCase(correctAnswers.get("f(1)"))) {
-            allCorrect = false;
-            editTextF1.setError("Incorrect answer");  // Set error on the EditText if wrong
-        }
-        if (!editTextFMinus1.getText().toString().equalsIgnoreCase(correctAnswers.get("f(-1)"))) {
-            allCorrect = false;
-            editTextFMinus1.setError("Incorrect answer");  // Set error on the EditText if wrong
-        }
-        if (!editTextBound.getText().toString().equalsIgnoreCase(correctAnswers.get("borders"))) {
-            allCorrect = false;
-            editTextBound.setError("Incorrect answer");  // Set error on the EditText if wrong
-        }
-        if (!editTextMonotonicity.getText().toString().equalsIgnoreCase(correctAnswers.get("monotonicity"))) {
-            allCorrect = false;
-            editTextMonotonicity.setError("Incorrect answer");  // Set error on the EditText if wrong
-        }
-
-        progressBar.setVisibility(View.VISIBLE);
+        // Check each answer and set errors accordingly
+        allCorrect &= checkAnswer(editTextEven, correctAnswers.get("even"), "Incorrect answer");
+        allCorrect &= checkAnswer(editTextOdd, correctAnswers.get("odd"), "Incorrect answer");
+        allCorrect &= checkAnswer(editTextF0, correctAnswers.get("f(0)"), "Incorrect answer");
+        allCorrect &= checkAnswer(editTextIntersection, correctAnswers.get("intersection"), "Incorrect answer");
+        allCorrect &= checkAnswer(editTextF1, correctAnswers.get("f(1)"), "Incorrect answer");
+        allCorrect &= checkAnswer(editTextFMinus1, correctAnswers.get("f(-1)"), "Incorrect answer");
+        allCorrect &= checkAnswer(editTextBound, correctAnswers.get("borders"), "Incorrect answer");
+        allCorrect &= checkAnswer(editTextMonotonicity, correctAnswers.get("monotonicity"), "Incorrect answer");
 
         if (allCorrect) {
-            // Assuming you've already fetched the graph URL from Firestore
-            String graphURL = correctAnswers.get("graphURL"); // make sure you've fetched this
+            // Load and display the graph if all answers are correct
+            String graphURL = correctAnswers.get("graphURL");
             if (graphURL != null && !graphURL.isEmpty()) {
                 fetchAndDisplayImage(imageViewGraph, graphURL);
             } else {
@@ -161,10 +151,19 @@ public class EEx1 extends Fragment {
                 progressBar.setVisibility(View.GONE);
             }
         } else {
-            imageViewGraph.setVisibility(View.GONE);
+            imageViewGraph.setVisibility(View.GONE); // Hide the graph if any answers are incorrect
             progressBar.setVisibility(View.GONE);
         }
     }
+
+    private boolean checkAnswer(EditText editText, String correctAnswer, String errorMessage) {
+        if (!editText.getText().toString().equalsIgnoreCase(correctAnswer)) {
+            editText.setError(errorMessage);
+            return false;
+        }
+        return true;
+    }
+
 
     private void fetchAndDisplayImage(ImageView imageView, String path) {
         FirebaseStorage storage = FirebaseStorage.getInstance();

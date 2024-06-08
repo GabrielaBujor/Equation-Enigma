@@ -24,7 +24,7 @@
         android:textSize="30dp"
         android:textColor="@color/black"
         android:layout_marginTop="10dp"
-        android:fontFamily="@font/playfairdisplay_black"/>
+        android:fontFamily="@font/opensans_semicondensedbold"/>
 
     <EditText
         android:id="@+id/editTextName"
@@ -34,7 +34,7 @@
         android:inputType="textPersonName"
         android:layout_marginTop="50dp"
         android:minHeight="48dp"
-        android:fontFamily="@font/playfairdisplay_regular"/>
+        android:fontFamily="@font/opensans_regular"/>
 
     <ImageView
         android:id="@+id/imageViewProfile"

@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:fontFamily="@font/playfairdisplay_black"/>
+            android:fontFamily="@font/opensans_semicondensedbold"/>
 
         <TextView
             android:id="@+id/textViewFunction"
@@ -31,7 +31,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/playfairdisplay_regular"/>
+            android:fontFamily="@font/opensans_regular"/>
 
         <TextView
             android:id="@+id/textViewParity"
@@ -42,7 +42,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/playfairdisplay_regular"/>
+            android:fontFamily="@font/opensans_regular"/>
 
         <TextView
             android:id="@+id/textViewIntersection"
@@ -53,7 +53,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/playfairdisplay_regular"/>
+            android:fontFamily="@font/opensans_regular"/>
 
         <TextView
             android:id="@+id/textViewBorders"
@@ -64,7 +64,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/playfairdisplay_regular"/>
+            android:fontFamily="@font/opensans_regular"/>
 
         <TextView
             android:id="@+id/textViewExtremePoints"
@@ -75,7 +75,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/playfairdisplay_regular"/>
+            android:fontFamily="@font/opensans_regular"/>
 
         <TextView
             android:id="@+id/textViewMonotonicity"
@@ -86,7 +86,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/playfairdisplay_regular"/>
+            android:fontFamily="@font/opensans_regular"/>
 
         <TextView
             android:id="@+id/textViewBijectivity"
@@ -97,7 +97,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/playfairdisplay_regular"/>
+            android:fontFamily="@font/opensans_regular"/>
 
         <TextView
             android:id="@+id/textViewConvexity"
@@ -108,7 +108,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:fontFamily="@font/playfairdisplay_regular"/>
+            android:fontFamily="@font/opensans_regular"/>
 
         <ImageView
             android:id="@+id/imageViewGraph"

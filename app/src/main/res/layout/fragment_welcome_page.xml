@@ -36,7 +36,7 @@
                 android:id="@+id/textViewDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/playfairdisplay_black"
+                android:fontFamily="@font/opensans_semicondensedbold"
                 android:textColor="#000000"
                 android:textSize="18sp"
                 android:layout_marginTop="16dp"

@@ -36,7 +36,7 @@ public class WelcomePageFragment extends Fragment {
         ImageView imageView = view.findViewById(R.id.imageView);
         TextView textViewDescription = view.findViewById(R.id.textViewDescription);
 
-        Typeface typeface = ResourcesCompat.getFont(getContext(), R.font.playfairdisplay_black);
+        Typeface typeface = ResourcesCompat.getFont(getContext(), R.font.opensans_semicondensedbold);
         textViewDescription.setTypeface(typeface);
 
         imageView.animate().scaleX(1.1f).scaleY(1.1f).setDuration(500).start();
