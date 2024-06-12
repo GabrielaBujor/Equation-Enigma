@@ -3,6 +3,7 @@ package com.example.equationenigma.Exponential;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.text.Html;
 import android.util.Log;
@@ -17,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.equationenigma.HomeFragment;
 import com.example.equationenigma.R;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -31,11 +33,13 @@ import java.util.Map;
 public class EEx3 extends Fragment {
 
     private TextView textViewTitle, textViewFunction, textViewInverseF, textViewExtremePoints, textViewMonotonicityHint, textViewBijectivity, textViewConvexity;
-    private EditText editTextEven, editTextOdd, editTextF0, editTextIntersection, editTextF1, editTextFMinus1, editTextBound, editTextMonotonicity;
+    private EditText editTextEven, editTextOdd, editTextF0, editTextIntersection, editTextF1, editTextF2, editTextBound, editTextMonotonicity;
     private Button buttonVerify;
     private ImageView imageViewGraph;
     private ProgressBar progressBar;
     private ImageButton hintButton;
+    private Button HomeButton;
+
 
     private Map<String, String> correctAnswers = new HashMap<>();
 
@@ -60,13 +64,15 @@ public class EEx3 extends Fragment {
         editTextF0 = view.findViewById(R.id.editTextF0);
         editTextIntersection = view.findViewById(R.id.editTextIntersection);
         editTextF1 = view.findViewById(R.id.editTextF1);
-        editTextFMinus1 = view.findViewById(R.id.editTextFMinus1);
+        editTextF2 = view.findViewById(R.id.editTextF2);
         editTextBound = view.findViewById(R.id.editTextBound);
         editTextMonotonicity = view.findViewById(R.id.editTextMonotonicity);
         buttonVerify = view.findViewById(R.id.buttonVerify);
         imageViewGraph = view.findViewById(R.id.imageViewGraph);
         progressBar = view.findViewById(R.id.progressBar);
         hintButton = view.findViewById(R.id.hintButton);
+        HomeButton = view.findViewById(R.id.homeButton);
+
 
         progressBar.setVisibility(View.VISIBLE);
 
@@ -83,6 +89,14 @@ public class EEx3 extends Fragment {
 
         buttonVerify.setOnClickListener(v -> verifyAnswers());
 
+        HomeButton.setOnClickListener(v -> {
+            FragmentManager fragmentManager = getParentFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.frame_layout, new HomeFragment()) // 'R.id.fragment_container' is the container ID from the main activity's layout.
+                    .addToBackStack(null) // Optional, if you want to add the transaction to the back stack.
+                    .commit();
+        });
+
         return view;
     }
     private void fetchExerciseData() {
@@ -91,38 +105,36 @@ public class EEx3 extends Fragment {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // Set the text from Firestore to the TextViews
+                        // Store the text data in TextViews
                         textViewTitle.setText(documentSnapshot.getString("title"));
                         textViewFunction.setText(documentSnapshot.getString("function"));
                         textViewInverseF.setText(documentSnapshot.getString("f(-x)"));
                         textViewExtremePoints.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("extremePoints")));
                         textViewBijectivity.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("bijectivity")));
                         textViewConvexity.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("convexity")));
-                        String hint = documentSnapshot.getString("monotonicityHint");
-                        textViewMonotonicityHint = getView().findViewById(R.id.textViewMonotonicityHint);
-                        textViewMonotonicityHint.setText(hint);
+                        textViewMonotonicityHint.setText(documentSnapshot.getString("monotonicityHint"));
 
-                        String graphURL = documentSnapshot.getString("graphURL");  // Get the image URL from Firestore
+                        // Store the graph URL for later use
+                        correctAnswers.put("graphURL", documentSnapshot.getString("graphURL"));
 
-                        // You might want to check if the URL is not null or empty before trying to load it
-                        if (graphURL != null && !graphURL.isEmpty()) {
-                            fetchAndDisplayImage(imageViewGraph, graphURL);
-                        } else {
-                            Toast.makeText(getContext(), "No image available", Toast.LENGTH_SHORT).show();
-                        }
-
-                        // Store the correct answers in a Map
+                        // Store other correct answers
                         correctAnswers.put("even", documentSnapshot.getString("parity"));
                         correctAnswers.put("odd", documentSnapshot.getString("parity"));
                         correctAnswers.put("f(0)", documentSnapshot.getString("f(0)"));
                         correctAnswers.put("f(1)", documentSnapshot.getString("f(1)"));
-                        correctAnswers.put("f(-1)", documentSnapshot.getString("f(-1)"));
+                        correctAnswers.put("f(2)", documentSnapshot.getString("f(2)"));
                         correctAnswers.put("borders", documentSnapshot.getString("borders"));
                         correctAnswers.put("intersection", documentSnapshot.getString("intersection"));
                         correctAnswers.put("monotonicity", documentSnapshot.getString("monotonicity"));
+
+                        progressBar.setVisibility(View.GONE);  // Ensure to hide progress bar after fetching data
+                    } else {
+                        Toast.makeText(getContext(), "Document does not exist!", Toast.LENGTH_SHORT).show();
                     }
                 })
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Error loading exercise data", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Error loading exercise data", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void verifyAnswers() {
@@ -135,12 +147,12 @@ public class EEx3 extends Fragment {
         allCorrect &= checkAnswer(editTextF0, correctAnswers.get("f(0)"), "Incorrect answer");
         allCorrect &= checkAnswer(editTextIntersection, correctAnswers.get("intersection"), "Incorrect answer");
         allCorrect &= checkAnswer(editTextF1, correctAnswers.get("f(1)"), "Incorrect answer");
-        allCorrect &= checkAnswer(editTextFMinus1, correctAnswers.get("f(-1)"), "Incorrect answer");
+        allCorrect &= checkAnswer(editTextF2, correctAnswers.get("f(2)"), "Incorrect answer");
         allCorrect &= checkAnswer(editTextBound, correctAnswers.get("borders"), "Incorrect answer");
         allCorrect &= checkAnswer(editTextMonotonicity, correctAnswers.get("monotonicity"), "Incorrect answer");
 
         if (allCorrect) {
-            // Load and display the graph if all answers are correct
+            // Only load and display the graph if all answers are correct
             String graphURL = correctAnswers.get("graphURL");
             if (graphURL != null && !graphURL.isEmpty()) {
                 fetchAndDisplayImage(imageViewGraph, graphURL);

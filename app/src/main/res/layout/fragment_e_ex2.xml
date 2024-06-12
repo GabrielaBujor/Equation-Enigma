@@ -131,7 +131,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:fontFamily="@font/opensans_regular"
-                    android:hint="Ox / Oy in A(x, y)"
+                    android:hint="Ox / Oy in A(x,y)"
                     android:textSize="22sp" />
             </LinearLayout>
 
@@ -219,8 +219,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="10dp"
                 android:fontFamily="@font/opensans_regular"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:textSize="22sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -244,20 +243,11 @@
                     android:textSize="22sp" />
             </LinearLayout>
 
-            <!--            <Button-->
-            <!--                android:id="@+id/buttonHint"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:text="?"-->
-            <!--                android:visibility="visible"-->
-            <!--                android:onClick="showHint"/>-->
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp">
 
-                <!-- ImageView for the hint button -->
                 <ImageButton
                     android:id="@+id/hintButton"
                     android:layout_width="48dp"
@@ -287,8 +277,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="10dp"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:textSize="22sp" />
 
             <TextView
                 android:id="@+id/textViewConvexity"
@@ -297,8 +286,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="10dp"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:textSize="22sp"/>
 
             <Button
                 android:id="@+id/buttonVerify"
@@ -319,6 +307,15 @@
                 android:scaleType="fitCenter"
                 android:visibility="gone" />
 
+            <Button
+                android:id="@+id/homeButton"
+                android:layout_width="170dp"
+                android:layout_height="wrap_content"
+                android:text="Back to homepage"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/rounded_button"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="50dp"/>
         </LinearLayout>
     </ScrollView>
 

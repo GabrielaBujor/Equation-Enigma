@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true"
     tools:context=".UserProfileFragment"
     android:background="@drawable/background">
@@ -13,6 +14,15 @@
         android:orientation="vertical"
         android:padding="16dp"
         android:gravity="center_horizontal">
+
+<!--        <androidx.appcompat.widget.Toolbar-->
+<!--            android:id="@+id/my_toolbar"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="?attr/actionBarSize"-->
+<!--            android:elevation="4dp"-->
+<!--            android:layout_marginTop="16dp"-->
+<!--            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"-->
+<!--            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />-->
 
         <TextView
             android:layout_width="wrap_content"

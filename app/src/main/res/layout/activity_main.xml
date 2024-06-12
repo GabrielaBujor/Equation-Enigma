@@ -8,13 +8,15 @@
     android:background="@drawable/background"
     tools:context=".MainActivity">
 
-<!--    <TextView-->
+<!--    <androidx.appcompat.widget.Toolbar-->
+<!--        android:id="@+id/my_toolbar"-->
 <!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:text="Main activity"-->
-<!--        android:gravity="center"-->
-<!--        android:textSize="30dp"-->
-<!--        android:textColor="@color/black"/>-->
+<!--        android:layout_height="?attr/actionBarSize"-->
+<!--        android:elevation="4dp"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"-->
+<!--        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />-->
+
 
     <FrameLayout
         android:layout_width="match_parent"
