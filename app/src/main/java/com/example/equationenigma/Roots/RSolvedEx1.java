@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -61,6 +63,12 @@ public class RSolvedEx1 extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_r_solved_ex1, container, false);
+
+        Toolbar toolbar = view.findViewById(R.id.my_toolbar);
+        if (getActivity() instanceof AppCompatActivity) {
+            AppCompatActivity activity = (AppCompatActivity) getActivity();
+            activity.setSupportActionBar(toolbar);
+        }
 
         textViewTitle = view.findViewById(R.id.textViewTitle);
         textViewFunction = view.findViewById(R.id.textViewFunction);

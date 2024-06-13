@@ -2,6 +2,8 @@ package com.example.equationenigma.Power;
 
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -52,6 +54,13 @@ public class PEx1 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_p_ex1, container, false);
+
+        Toolbar toolbar = view.findViewById(R.id.my_toolbar);
+        if (getActivity() instanceof AppCompatActivity) {
+            AppCompatActivity activity = (AppCompatActivity) getActivity();
+            activity.setSupportActionBar(toolbar);
+        }
+
         textViewTitle = view.findViewById(R.id.textViewTitle);
         textViewFunction = view.findViewById(R.id.textViewFunction);
         textViewInverseF = view.findViewById(R.id.textViewInverseF);
