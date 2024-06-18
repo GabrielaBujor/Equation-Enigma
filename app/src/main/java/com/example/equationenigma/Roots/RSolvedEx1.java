@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.equationenigma.HomeFragment;
+import com.example.equationenigma.MainActivity;
 import com.example.equationenigma.Power.PSolvedEx1;
 import com.example.equationenigma.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -180,5 +181,17 @@ public class RSolvedEx1 extends Fragment {
                     // You can also update the UI to reflect the error
                     // For example, hiding the loading indicator or showing an error message directly in the UI
                 });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity) getActivity()).hideBottomNavigation();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((MainActivity) getActivity()).showBottomNavigation();
     }
 }

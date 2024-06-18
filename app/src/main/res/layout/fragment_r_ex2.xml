@@ -130,7 +130,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/opensans_regular"
-                    android:text="So f(x) intersects "
+                    android:text="So f(x) intersects both axis in"
                     android:textSize="22sp" />
 
                 <EditText
@@ -139,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:fontFamily="@font/opensans_regular"
-                    android:hint="Ox / Oy in A(x,y)"
+                    android:hint="A(x,y)"
                     android:textSize="22sp" />
             </LinearLayout>
 

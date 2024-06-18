@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.equationenigma.MainActivity;
 import com.example.equationenigma.QuizReport;
 import com.example.equationenigma.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -314,8 +315,15 @@ public class Quiz4 extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        ((MainActivity) getActivity()).hideBottomNavigation();
         if (!timerRunning) {
             startTimer();
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((MainActivity) getActivity()).showBottomNavigation();
     }
 }

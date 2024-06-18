@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.equationenigma.HomeFragment;
+import com.example.equationenigma.MainActivity;
 import com.example.equationenigma.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -175,5 +176,17 @@ public class PSolvedEx2 extends Fragment {
                     // Inform the user that an error occurred
                     Toast.makeText(getContext(), "Error loading exercise.", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity) getActivity()).hideBottomNavigation();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((MainActivity) getActivity()).showBottomNavigation();
     }
 }

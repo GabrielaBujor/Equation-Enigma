@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.equationenigma.MainActivity;
 import com.example.equationenigma.QuizReport;
 import com.example.equationenigma.R;
 
@@ -206,11 +207,13 @@ public class Quiz1 extends Fragment {
             return;
         }
 
-        String currentUserName = user.getDisplayName();
-        if (currentUserName == null || currentUserName.isEmpty()) {
-            Log.d(TAG, "User name is not set or empty");
-            currentUserName = "Unknown User"; // Consider changing this to user.getEmail() or just using user.getUid()
-        }
+        String currentUserName = user.getDisplayName() != null ? user.getDisplayName() : "Unknown User";
+
+//        String currentUserName = user.getDisplayName();
+//        if (currentUserName == null || currentUserName.isEmpty()) {
+//            Log.d(TAG, "User name is not set or empty");
+//            currentUserName = "Unknown User";
+//        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String reportName = sdf.format(new Date());
@@ -222,7 +225,7 @@ public class Quiz1 extends Fragment {
         }
 
         Map<String, Object> reportData = new HashMap<>();
-        reportData.put("userName", currentUserName); // Make sure this is consistent with how you fetch data in ReportFragment
+        reportData.put("userName", currentUserName);
         reportData.put("userId", user.getUid());
         reportData.put("reportName", reportName);
         reportData.put("mistakes", mistakes);
@@ -318,8 +321,15 @@ public class Quiz1 extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        ((MainActivity) getActivity()).hideBottomNavigation();
         if (!timerRunning) {
             startTimer();
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((MainActivity) getActivity()).showBottomNavigation();
     }
 }

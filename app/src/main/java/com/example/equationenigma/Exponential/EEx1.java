@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.equationenigma.HomeFragment;
+import com.example.equationenigma.MainActivity;
 import com.example.equationenigma.R;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -219,5 +220,17 @@ public class EEx1 extends Fragment {
         });
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity) getActivity()).hideBottomNavigation();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((MainActivity) getActivity()).showBottomNavigation();
+    }
 
 }

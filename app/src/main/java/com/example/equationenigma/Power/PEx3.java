@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.equationenigma.HomeFragment;
+import com.example.equationenigma.MainActivity;
 import com.example.equationenigma.R;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -101,7 +102,7 @@ public class PEx3 extends Fragment {
                         // Store the text data in TextViews
                         textViewTitle.setText(documentSnapshot.getString("title"));
                         textViewFunction.setText(documentSnapshot.getString("function"));
-                        textViewInverseF.setText(documentSnapshot.getString("f(-x))"));
+                        textViewInverseF.setText(documentSnapshot.getString("f(-x)"));
                         textViewBorders.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("borders")));
                         textViewBijectivity.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("bijectivity")));
                         textViewConvexity.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("convexity")));
@@ -193,5 +194,17 @@ public class PEx3 extends Fragment {
             imageView.setImageResource(R.drawable.error);
             Log.e("FirebaseStorage", "Error getting image", exception);
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity) getActivity()).hideBottomNavigation();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        ((MainActivity) getActivity()).showBottomNavigation();
     }
 }
