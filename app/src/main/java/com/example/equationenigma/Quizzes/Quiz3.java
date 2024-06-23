@@ -23,6 +23,11 @@ import com.example.equationenigma.QuizReport;
 import com.example.equationenigma.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -204,33 +209,44 @@ public class Quiz3 extends Fragment {
             return;
         }
 
-        String currentUserName = user.getDisplayName();
-        if (currentUserName == null || currentUserName.isEmpty()) {
-            Log.d(TAG, "User name is not set or empty");
-            currentUserName = "Unknown User"; // Consider changing this to user.getEmail() or just using user.getUid()
-        }
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(user.getUid());
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        String reportName = sdf.format(new Date());
-        int mistakes = calculateMistakes();
-        String timeTaken = timerTextView.getText().toString();
-        Map<String, Object> detailedResults = new HashMap<>();
-        for (int i = 0; i < functionViews.length; i++) {
-            detailedResults.put(functionViews[i].getText().toString(), matchStatus[i]);
-        }
+        // Fetch the latest user data from Firebase Realtime Database
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String currentUserName = dataSnapshot.exists() && dataSnapshot.child("fullName").getValue(String.class) != null ?
+                        dataSnapshot.child("fullName").getValue(String.class) : "Unknown User";
 
-        Map<String, Object> reportData = new HashMap<>();
-        reportData.put("userName", currentUserName); // Make sure this is consistent with how you fetch data in ReportFragment
-        reportData.put("userId", user.getUid());
-        reportData.put("reportName", reportName);
-        reportData.put("mistakes", mistakes);
-        reportData.put("timeTaken", timeTaken);
-        reportData.put("detailedResults", detailedResults);
+                // Proceed to create and save the report with the current user name
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                String reportName = sdf.format(new Date());
+                int mistakes = calculateMistakes();
+                String timeTaken = timerTextView.getText().toString();
+                Map<String, Object> detailedResults = new HashMap<>();
+                for (int i = 0; i < functionViews.length; i++) {
+                    detailedResults.put(functionViews[i].getText().toString(), matchStatus[i]);
+                }
 
-        Log.d(TAG, "Attempting to save report for user: " + currentUserName);
-        Log.d(TAG, "Preparing to save report with data: " + reportData.toString());
+                Map<String, Object> reportData = new HashMap<>();
+                reportData.put("userName", currentUserName);
+                reportData.put("userId", user.getUid());
+                reportData.put("reportName", reportName);
+                reportData.put("mistakes", mistakes);
+                reportData.put("timeTaken", timeTaken);
+                reportData.put("detailedResults", detailedResults);
 
-        saveReportToFirebase(reportData);
+                Log.d(TAG, "Attempting to save report for user: " + currentUserName);
+                Log.d(TAG, "Preparing to save report with data: " + reportData.toString());
+
+                saveReportToFirebase(reportData);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "Failed to read user data for report.", databaseError.toException());
+            }
+        });
     }
 
     private boolean checkMatch(int functionIndex, int graphIndex) {

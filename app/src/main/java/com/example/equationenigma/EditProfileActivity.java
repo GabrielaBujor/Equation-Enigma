@@ -24,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -59,6 +60,20 @@ public class EditProfileActivity extends AppCompatActivity {
         buttonSave.setOnClickListener(view -> saveChanges());
     }
 
+//    private void loadUserProfile() {
+//        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+//        if(currentUser != null) {
+//            if(currentUser.getDisplayName() != null) {
+//                editTextName.setText(currentUser.getDisplayName());
+//            }
+//            if(currentUser.getPhotoUrl() != null) {
+//                Picasso.get().load(currentUser.getPhotoUrl()).into(imageViewProfile);
+//            } else {
+//                imageViewProfile.setImageResource(R.drawable.baseline_person_24);
+//            }
+//        }
+//    }
+
     private void openImageChooser() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
@@ -66,22 +81,109 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void saveChanges() {
         String name = editTextName.getText().toString().trim();
-        if(name.isEmpty()) {
-            showToastMessage("Name cannot be empty");
-            return;
-        }
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return; // Early exit if no user is logged in
 
-        if(imageUri != null) {
-            uploadImageToFirebase(name, imageUri);
+        boolean nameChanged = !name.isEmpty() && !name.equals(user.getDisplayName());
+        boolean imageChanged = imageUri != null;  // Check if a new image has been selected
+
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Updating profile...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        if (imageChanged) {
+            // If a new image is selected, upload it and handle updating name and image together
+            uploadImageToFirebase(user.getUid(), user.getDisplayName(), imageUri, progressDialog);
+        } else if (nameChanged) {
+            // If only the name is changed, update it along with the current photo URL
+            updateFirebaseAuthProfile(name, user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : null);
+            updateUserInRealtimeDatabase(user.getUid(), name, user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : null);
+            progressDialog.dismiss();
+            finishActivityWithResult(name);
         } else {
-            updateFirebaseAuthProfile(name, null);
-            updateUserInRealtimeDatabase(FirebaseAuth.getInstance().getCurrentUser().getUid(), name, null);
+            // No changes to save
+            progressDialog.dismiss();
+            Toast.makeText(this, "No changes to save.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private void uploadImageToFirebase(String userId, String name, Uri imageUri, ProgressDialog progressDialog) {
+        StorageReference fileRef = storageRef.child("profile_pics/" + userId + ".jpg");
+
+        fileRef.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    String imageUrl = uri.toString();
+                    // Update Firebase Auth with the new name and image URL
+                    updateFirebaseAuthProfile(name, imageUrl);
+                    // Update user details in Realtime Database
+                    updateUserInRealtimeDatabase(userId, name, imageUrl);
+                    progressDialog.dismiss();
+                    Toast.makeText(EditProfileActivity.this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                    finishActivityWithResult(name);
+                }))
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void updateUserInRealtimeDatabase(String userId, String name, String imageUrl) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
+
+        Map<String, Object> userUpdates = new HashMap<>();
+        if (name != null) {
+            userUpdates.put("fullName", name);  // Changed from "name" to "fullName"
+        }
+        if (imageUrl != null) {
+            userUpdates.put("profileImageUrl", imageUrl);
         }
 
+        if (!userUpdates.isEmpty()) {
+            databaseReference.updateChildren(userUpdates)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d("DatabaseUpdate", "User data updated successfully in Realtime Database.");
+                        Toast.makeText(EditProfileActivity.this, "Profile updated successfully.", Toast.LENGTH_SHORT).show();
+                        finishActivityWithResult(name);
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("DatabaseUpdate", "Failed to update user data.", e);
+                        Toast.makeText(EditProfileActivity.this, "Failed to update profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            Toast.makeText(this, "No changes to save.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private void updateFirebaseAuthProfile(String name, String imageUrl) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder()
+                    .setDisplayName(name);
+            if (imageUrl != null) {
+                builder.setPhotoUri(Uri.parse(imageUrl));
+            }
+
+            UserProfileChangeRequest profileUpdates = builder.build();
+
+            user.updateProfile(profileUpdates).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    // Also update in Realtime Database
+                    updateUserInRealtimeDatabase(user.getUid(), name, imageUrl);
+                    Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
+                    finishActivityWithResult(name);
+                } else {
+                    Toast.makeText(this, "Profile update failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
 
 
 
-        // Prepare result intent
+    private void finishActivityWithResult(String name) {
         Intent resultIntent = new Intent();
         resultIntent.putExtra("USER_NAME", name);
         resultIntent.putExtra("PROFILE_IMAGE_URI", imageUri != null ? imageUri.toString() : null);
@@ -89,86 +191,14 @@ public class EditProfileActivity extends AppCompatActivity {
         finish();
     }
 
-    private void uploadImageToFirebase(String name, Uri imageUri) {
-            progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("Uploading");
-            progressDialog.setMessage("Please wait while we upload your profile picture");
-            progressDialog.show();
-            StorageReference fileRef = storageRef.child("profile_pics/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + ".jpg");
-
-            fileRef.putFile(imageUri)
-                    .addOnSuccessListener(taskSnapshot -> {
-                        fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                            progressDialog.dismiss();
-                            String imageUrl = uri.toString();
-                            // Handle the URL (e.g., store in user's profile, update UI)
-                            updateFirebaseAuthProfile(name, imageUrl);
-                            updateUserInRealtimeDatabase(FirebaseAuth.getInstance().getCurrentUser().getUid(), name, imageUrl);
-                        });
-                    })
-                    .addOnFailureListener(e -> {
-                        // Handle unsuccessful uploads
-                        progressDialog.dismiss();
-                        showToastMessage("Upload failed: " + e.getMessage());
-                    });
-    }
-
-    private void updateFirebaseAuthProfile(String name, @Nullable String imageUrl) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder()
-                    .setDisplayName(name);
-
-            if (imageUrl != null) {
-                builder.setPhotoUri(Uri.parse(imageUrl));
-            }
-
-            UserProfileChangeRequest profileUpdates = builder.build();
-
-            user.updateProfile(profileUpdates)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Log.d("UserProfileUpdate", "User profile updated.");
-                            // Prepare and set the result for the activity
-                            Intent resultIntent = new Intent();
-                            resultIntent.putExtra("USER_NAME", name);
-                            resultIntent.putExtra("PROFILE_IMAGE_URI", imageUrl);
-                            setResult(RESULT_OK, resultIntent);
-                            finish();
-                        } else {
-                            // Handle the error
-                            Log.e("UserProfileUpdate", "Error updating profile", task.getException());
-                            showToastMessage("Profile update failed: " + task.getException().getMessage());
-                        }
-                    });
-        }
-    }
-
-
     private void showToastMessage(String message) {
-        Toast.makeText(EditProfileActivity.this, message, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
-
-    private void updateUserInRealtimeDatabase(String userId, String name, String imageUrl) {
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users").child(userId);
-
-        Map<String, Object> userUpdates = new HashMap<>();
-        userUpdates.put("name", name);
-        userUpdates.put("profileImageUrl", imageUrl);
-
-        databaseReference.updateChildren(userUpdates)
-                .addOnSuccessListener(aVoid -> Log.d("DatabaseUpdate", "User data updated successfully."))
-                .addOnFailureListener(e -> Log.e("DatabaseUpdate", "Failed to update user data.", e));
-    }
-
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
             imageUri = data.getData();
             imageViewProfile.setImageURI(imageUri);
         }

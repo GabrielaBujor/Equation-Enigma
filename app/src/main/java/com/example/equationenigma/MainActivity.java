@@ -24,6 +24,10 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(new HomeFragment());
         binding.bottomNavigationView.setBackground(null);
 
+//        if (getIntent().getBooleanExtra("SHOW_PROFILE", false)) {
+//            binding.bottomNavigationView.setSelectedItemId(R.id.navigation_profile);
+//        }
+
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
 
             switch (item.getItemId()) {
