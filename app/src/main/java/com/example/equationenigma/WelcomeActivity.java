@@ -26,10 +26,12 @@ public class WelcomeActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
+        // Initialize ViewPager2 and buttons
         ViewPager2 viewPager2 = findViewById(R.id.viewPager2);
         buttonNext = (Button) findViewById(R.id.button_next);
         buttonSkip = (Button) findViewById(R.id.button_skip);
 
+        // Data for the welcome pages
         List<Pair<Integer, String>> pagesData = Arrays.asList(
                 new Pair<>(R.drawable.graphs, "You will learn how to draw graphs"),
                 new Pair<>(R.drawable.plotting, "Using Geogebra, you will learn how to plot the graph of different functions"),
@@ -37,6 +39,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 new Pair<>(R.drawable.quote, "Keep it up and don't give up! You can do this")
         );
 
+        // Set up the adapter
         WelcomePagerAdapter adapter = new WelcomePagerAdapter(this, pagesData);
         viewPager2.setAdapter(adapter);
 
@@ -46,6 +49,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 int current = viewPager2.getCurrentItem();
                 int total = pagesData.size();
 
+                // Navigate to the next page or mark welcome screen as shown and navigate to the login page
                 if(current < total - 1) {
                     viewPager2.setCurrentItem(current + 1, true);
                 } else {
@@ -76,6 +80,7 @@ public class WelcomeActivity extends AppCompatActivity {
         });
     }
 
+    // Mark the welcome screen as shown
     private void markWelcomeScreenShown() {
         SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS_FILE, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
@@ -83,6 +88,7 @@ public class WelcomeActivity extends AppCompatActivity {
         editor.apply();
     }
 
+    // Navigate to the login screen
     private void navigateToLogin() {
         Intent intent = new Intent(WelcomeActivity.this, LogInActivity.class);
         startActivity(intent);

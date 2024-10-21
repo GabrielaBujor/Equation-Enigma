@@ -64,6 +64,7 @@ public class LogInActivity extends AppCompatActivity {
         signUpButton = findViewById(R.id.sign_up_button);
         rememberMeCheckBox = findViewById(R.id.checkbox_remember_me);
 
+        // Check if 'Remember Me' is enabled and load saved credentials
         boolean isRemembered = prefs.getBoolean("RememberMe", false);
         if (isRemembered) {
             String savedEmail = prefs.getString("Username", null);
@@ -110,6 +111,7 @@ public class LogInActivity extends AppCompatActivity {
         loginUser(email, password);
     }
 
+    // Method to login user
     private void loginUser(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(LogInActivity.this, new OnCompleteListener<AuthResult>() {

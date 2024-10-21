@@ -54,7 +54,6 @@ public class ESolvedEx2 extends Fragment {
 
     public static ESolvedEx2 createInstance() {
         ESolvedEx2 fragment = new ESolvedEx2();
-        // Do any initial setup or pass arguments here if needed
         return fragment;
     }
 

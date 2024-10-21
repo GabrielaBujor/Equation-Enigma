@@ -175,13 +175,5 @@ public class HomeFragment extends Fragment {
         listDataChild.put("Roots", rootsExercises);
         listDataChild.put("Logarithmic", logarithmicExercises);
         listDataChild.put("Exponential", exponentialExercises);
-
-
-
-
-
     }
-
-
-
 }

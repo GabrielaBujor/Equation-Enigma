@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -66,6 +67,7 @@ public class ReportFragment extends Fragment {
         reportsRecyclerView = rootView.findViewById(R.id.reportsRecyclerView);
         reportsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        // Initialize the adapter and set it to the RecyclerView
         reportAdapter = new ReportAdapter(reports);
         reportsRecyclerView.setAdapter(reportAdapter);
 
@@ -78,6 +80,7 @@ public class ReportFragment extends Fragment {
         return rootView;
     }
 
+    // Determine the user type and load data accordingly
     private void determineUserTypeAndLoadReports() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users").child(auth.getUid());
@@ -89,11 +92,13 @@ public class ReportFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String userType = dataSnapshot.child("userType").getValue(String.class);
                 if ("Teacher".equals(userType)) {
+                    // If user is a teacher, show search input and button
                     searchInput.setVisibility(View.VISIBLE);
                     searchButton.setVisibility(View.VISIBLE);
                     loadReportsForUser(auth.getUid());
                     setupSearchButton();
                 } else {
+                    // If user is a student, hide search input and button
                     searchInput.setVisibility(View.GONE);
                     searchButton.setVisibility(View.GONE);
                     loadReportsForUser(auth.getUid());
@@ -108,17 +113,23 @@ public class ReportFragment extends Fragment {
         });
     }
 
+    // Setup the search button click listener
     private void setupSearchButton() {
         searchButton.setOnClickListener(v -> {
             String searchText = searchInput.getText().toString().trim();
-            if(!searchText.isEmpty()) {
+            if (!searchText.isEmpty()) {
+                progressBar.setVisibility(View.VISIBLE); // Show progress bar when search button is clicked
                 searchStudentsReports(searchText);
+
+                // Hide progress bar after 2 seconds
+                new Handler().postDelayed(() -> progressBar.setVisibility(View.GONE), 2000);
             } else {
                 Toast.makeText(getContext(), "Please enter a student name to search", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    // Load reports for the specified user
     private void loadReportsForUser(String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Log.d(TAG, "Loading reports for user ID: " + userId);
@@ -148,6 +159,7 @@ public class ReportFragment extends Fragment {
                 });
     }
 
+    // Search reports by student name
     private void searchStudentsReports(String studentName) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 

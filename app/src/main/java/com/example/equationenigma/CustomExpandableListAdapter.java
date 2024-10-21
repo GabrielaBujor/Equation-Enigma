@@ -37,7 +37,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter{
         fragmentCreatorMap = new HashMap<>();
         fragmentCreatorMap.put("Solved ex 1", () -> new PSolvedEx1());
         fragmentCreatorMap.put("Solved ex 2", () -> new PSolvedEx2());
-// Add other exercises...
     }
 
     @Override

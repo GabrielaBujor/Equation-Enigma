@@ -39,19 +39,20 @@ import java.util.Locale;
 import java.util.Map;
 
 public class Quiz1 extends Fragment {
-    private TextView timerTextView;
-    private Button backButton;
+    private TextView timerTextView; // TextView for displaying the countdown timer
+    private Button backButton; // Button to navigate back
     private final boolean[] matchStatus = new boolean[4]; // Track if each function is matched
-    private final ImageView[] graphViews = new ImageView[4];
-    private final TextView[] functionViews = new TextView[4];
+    private final ImageView[] graphViews = new ImageView[4]; // Array for graphs
+    private final TextView[] functionViews = new TextView[4]; // Array for functions
     private final int[] matchedWith = new int[4]; // Store the index of the graph each function is matched with
+    private boolean[] matchAttempted;
     private int selectedFunctionIndex = -1; // -1 indicates no function is selected
-    private boolean[] isFunctionMatched;
+    private boolean[] isFunctionMatched; // Tracks whether each function has been matched
 
-    private int secondsElapsed = 0;
-    private Handler timerHandler = new Handler();
-    private boolean timerRunning = false;
-    private static final String TAG = "Quiz 1";
+    private int secondsElapsed = 0; // Counter for the number of seconds elapsed
+    private Handler timerHandler = new Handler(); // Handler for timer events
+    private boolean timerRunning = false; // Indicates whether timer is running
+    private static final String TAG = "Quiz 1"; // Used for logging
 
 
     private Runnable timerRunnable = new Runnable() {
@@ -86,6 +87,8 @@ public class Quiz1 extends Fragment {
         isFunctionMatched = new boolean[functionViews.length];
         Arrays.fill(isFunctionMatched, false);  // Initially, no functions are matched
 
+        matchAttempted = new boolean[functionViews.length];
+        Arrays.fill(matchAttempted, false); // Initially, no functions have been attempted
 
         // Start the timer
         startTimer();
@@ -114,6 +117,7 @@ public class Quiz1 extends Fragment {
     }
 
     private void setupFunctionListeners() {
+
         for (int i = 0; i < functionViews.length; i++) {
             final int index = i;
             functionViews[i].setOnClickListener(v -> onFunctionSelected(index));
@@ -146,6 +150,8 @@ public class Quiz1 extends Fragment {
         }
 
         matchedWith[selectedFunctionIndex] = index; // Record which graph was selected for which function
+        matchAttempted[selectedFunctionIndex] = true; // Mark this function as attempted
+
         boolean isMatchCorrect = checkMatch(selectedFunctionIndex, index);
         matchStatus[selectedFunctionIndex] = isMatchCorrect;
 
@@ -171,15 +177,13 @@ public class Quiz1 extends Fragment {
         functionViews[selectedFunctionIndex].setClickable(false);
         graphViews[graphIndex].setClickable(false);
 
-        // Mark the function as matched
-        isFunctionMatched[selectedFunctionIndex] = true;
     }
 
 
     private void resetFunctionSelections() {
         for (int i = 0; i < functionViews.length; i++) {
             // Only reset the background color if the function has not been matched
-            if (!isFunctionMatched[i]) {
+            if (!matchAttempted[i]) {
                 functionViews[i].setBackgroundColor(Color.TRANSPARENT);
             }
         }
@@ -256,17 +260,17 @@ public class Quiz1 extends Fragment {
         // Correct match if indices are the same
         return functionIndex == graphIndex;
     }
-
-    private boolean allMatchesCorrect() {
-        for (int i = 0; i < matchStatus.length; i++) {
-            if (matchedWith[i] != -1) {
-                matchStatus[i] = checkMatch(i, matchedWith[i]);
-            } else {
-                return false;
-            }
-        }
-        return true;
-    }
+//
+//    private boolean allMatchesCorrect() {
+//        for (int i = 0; i < matchStatus.length; i++) {
+//            if (matchedWith[i] != -1) {
+//                matchStatus[i] = checkMatch(i, matchedWith[i]);
+//            } else {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
 
     private void saveReportToFirebase(Map<String, Object> reportData) {

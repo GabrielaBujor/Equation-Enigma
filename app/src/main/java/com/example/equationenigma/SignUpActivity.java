@@ -51,6 +51,7 @@ public class SignUpActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
+        // Initialize Firebase Auth, Firestore, Realtime Database
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         dbRT = FirebaseDatabase.getInstance().getReference("Users");
@@ -59,6 +60,7 @@ public class SignUpActivity extends AppCompatActivity {
         setupSignUpButton();
     }
 
+    // Initialize UI components
     private void setupUI() {
         editTextFullName = findViewById(R.id.editTextFullName);
         editTextEmail = findViewById(R.id.editTextEmail);
@@ -67,12 +69,14 @@ public class SignUpActivity extends AppCompatActivity {
         spinnerUserType = findViewById(R.id.spinnerUserType);
         buttonSignUp = findViewById(R.id.buttonSignUp);
 
+        // Set up the spinner for user type selection
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.user_types, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUserType.setAdapter(adapter);
     }
 
+    // Method to set up the sign-up button listener
     private void setupSignUpButton() {
         buttonSignUp.setOnClickListener(v -> {
             Log.d(TAG, "Sign Up button clicked");
@@ -86,9 +90,11 @@ public class SignUpActivity extends AppCompatActivity {
             if (!validateInputs(fullName, email, password, confirmPassword))
                 return;
 
+            // Create a new user with email and password
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
+                            // Get the current Firebase user
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
                             if (firebaseUser == null) {
                                 Toast.makeText(SignUpActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
@@ -107,6 +113,7 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
+    // Write user data to Firestore and Realtime Database
     private void writeUserDataToDatabases(User user, String userId) {
         // Firestore
         db.collection("Users").document(userId).set(user)
@@ -130,6 +137,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
 
+    // Method to validate input fields
     private boolean validateInputs(String fullName, String email, String password, String confirmPassword) {
         if(fullName.isEmpty()) {
             editTextFullName.setError("Full name is required");
@@ -169,15 +177,18 @@ public class SignUpActivity extends AppCompatActivity {
         return true;
     }
 
+    // Check if an email is valid
     private boolean isValidEmail(String email) {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
+    // Check password is valid
     private boolean isValidPassword(String password) {
         Pattern pattern = Pattern.compile("^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).{8,}$");
         return pattern.matcher(password).matches();
     }
 
+    // Method to handle sign-up errors
     private void handleSignUpError(Task<AuthResult> task) {
         if (task.getException() instanceof FirebaseAuthUserCollisionException) {
             Toast.makeText(this, "User with this email already exists.", Toast.LENGTH_SHORT).show();
@@ -186,6 +197,7 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
+    // Navigate to login page
     private void navigateToLogin() {
         Intent intent = new Intent(SignUpActivity.this, LogInActivity.class);
         startActivity(intent);

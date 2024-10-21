@@ -34,7 +34,7 @@ import java.util.Map;
 
 
 public class EEx1 extends Fragment {
-
+    // Variables
     private TextView textViewTitle, textViewFunction, textViewInverseF, textViewExtremePoints, textViewMonotonicityHint, textViewBijectivity, textViewConvexity;
     private EditText editTextEven, editTextOdd, editTextF0, editTextIntersection, editTextF1, editTextFMinus1, editTextBound, editTextMonotonicity;
     private Button buttonVerify;
@@ -53,7 +53,7 @@ public class EEx1 extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Inflate the layout for this fragment and set up the toolbar
         View view = inflater.inflate(R.layout.fragment_e_ex1, container, false);
 
         Toolbar toolbar = view.findViewById(R.id.my_toolbar);
@@ -62,6 +62,7 @@ public class EEx1 extends Fragment {
             activity.setSupportActionBar(toolbar);
         }
 
+        // Initialize view components
         textViewTitle = view.findViewById(R.id.textViewTitle);
         textViewFunction = view.findViewById(R.id.textViewFunction);
         textViewInverseF = view.findViewById(R.id.textViewInverseF);
@@ -94,6 +95,7 @@ public class EEx1 extends Fragment {
             }
         });
 
+        // Fetch exercise data from Firestore
         fetchExerciseData();
 
         buttonVerify.setOnClickListener(v -> verifyAnswers());
@@ -101,8 +103,8 @@ public class EEx1 extends Fragment {
         HomeButton.setOnClickListener(v -> {
             FragmentManager fragmentManager = getParentFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout, new HomeFragment()) // 'R.id.fragment_container' is the container ID from the main activity's layout.
-                    .addToBackStack(null) // Optional, if you want to add the transaction to the back stack.
+                    .replace(R.id.frame_layout, new HomeFragment()) //  container ID from the main activity's layout.
+                    .addToBackStack(null) // add the transaction to the back stack.
                     .commit();
         });
 
@@ -124,10 +126,10 @@ public class EEx1 extends Fragment {
                         textViewConvexity.setText(Html.fromHtml("&#8226; " + documentSnapshot.getString("convexity")));
                         textViewMonotonicityHint.setText(documentSnapshot.getString("monotonicityHint"));
 
-                        // Store the graph URL for later use
+                        // Store the graph URL
                         correctAnswers.put("graphURL", documentSnapshot.getString("graphURL"));
 
-                        // Store other correct answers
+                        // Store correct answers
                         correctAnswers.put("even", documentSnapshot.getString("parity"));
                         correctAnswers.put("odd", documentSnapshot.getString("parity"));
                         correctAnswers.put("f(0)", documentSnapshot.getString("f(0)"));
@@ -147,6 +149,7 @@ public class EEx1 extends Fragment {
                 });
     }
 
+    // Verify user answers against the correct answers stored
     private void verifyAnswers() {
         boolean allCorrect = true;
         progressBar.setVisibility(View.VISIBLE);
@@ -177,6 +180,7 @@ public class EEx1 extends Fragment {
     }
 
 
+    // Check answer against correct answer
     private boolean checkAnswer(EditText editText, String correctAnswer, String errorMessage) {
         if (!editText.getText().toString().equalsIgnoreCase(correctAnswer)) {
             editText.setError(errorMessage);
@@ -186,6 +190,7 @@ public class EEx1 extends Fragment {
     }
 
 
+    // Fetch and display image from Firebase Storage
     private void fetchAndDisplayImage(ImageView imageView, String path) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         if (!path.startsWith("gs://")) {

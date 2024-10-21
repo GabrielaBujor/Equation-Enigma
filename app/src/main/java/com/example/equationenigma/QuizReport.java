@@ -11,8 +11,6 @@ public class QuizReport {
     private String timeTaken;
     private Map<String, Boolean> detailedResults;
 
-    // Constructor
-
     // No-argument constructor required for Firebase deserialization
     public QuizReport() {
         //Default constructor required for calls to DataSnapshot.getValue(QuizReport.class)
@@ -52,7 +50,7 @@ public class QuizReport {
         return detailedResults;
     }
 
-    // Setters if needed
+    // Setters
     public void setUserName(String userName) {
         this.userName = userName;
     }

@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ChaptersExpandableListAdapter extends BaseExpandableListAdapter {
-    private Context context;
-    private List<String> listDataHeader; // Header titles ("Power", "Roots", etc.)
+    private Context context; // Context for accessing resources and layout inflater
+    private List<String> listDataHeader; // List of group headers
     private HashMap<String, List<String>> listDataChild; // Child data in format of header title, child title
 
     // Constructor
@@ -26,37 +26,38 @@ public class ChaptersExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getGroupCount() {
-        return this.listDataHeader.size();
+        return this.listDataHeader.size(); // Returns the number of headers
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return this.listDataChild.get(this.listDataHeader.get(groupPosition)).size();
+        return this.listDataChild.get(this.listDataHeader.get(groupPosition)).size(); // Returns the number of children
     }
 
     @Override
     public Object getGroup(int groupPosition) {
-        return this.listDataHeader.get(groupPosition);
+        return this.listDataHeader.get(groupPosition); // Returns the group at the specified position
     }
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
         return this.listDataChild.get(this.listDataHeader.get(groupPosition)).get(childPosition);
+        // Returns the child at the specified position within a group
     }
 
     @Override
     public long getGroupId(int groupPosition) {
-        return groupPosition;
+        return groupPosition; // Returns the group position as its ID
     }
 
     @Override
     public long getChildId(int groupPosition, int childPosition) {
-        return childPosition;
+        return childPosition; // Returns the child position within its group as its ID
     }
 
     @Override
     public boolean hasStableIds() {
-        return false;
+        return false; // Indicates that IDs are not stable
     }
 
     @Override

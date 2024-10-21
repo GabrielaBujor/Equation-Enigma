@@ -45,6 +45,7 @@ public class Quiz3 extends Fragment {
     private final ImageView[] graphViews = new ImageView[4];
     private final TextView[] functionViews = new TextView[4];
     private final int[] matchedWith = new int[4]; // Store the index of the graph each function is matched with
+    private boolean[] matchAttempted;
     private int selectedFunctionIndex = -1; // -1 indicates no function is selected
     private boolean[] isFunctionMatched;
     private int secondsElapsed = 0;
@@ -84,6 +85,9 @@ public class Quiz3 extends Fragment {
         java.util.Arrays.fill(matchedWith, -1);
         isFunctionMatched = new boolean[functionViews.length];
         Arrays.fill(isFunctionMatched, false);  // Initially, no functions are matched
+
+        matchAttempted = new boolean[functionViews.length];
+        Arrays.fill(matchAttempted, false); // Initially, no functions have been attempted
 
         // Start the timer
         startTimer();
@@ -144,6 +148,8 @@ public class Quiz3 extends Fragment {
         }
 
         matchedWith[selectedFunctionIndex] = index; // Record which graph was selected for which function
+        matchAttempted[selectedFunctionIndex] = true; // Mark this function as attempted
+
         boolean isMatchCorrect = checkMatch(selectedFunctionIndex, index);
         matchStatus[selectedFunctionIndex] = isMatchCorrect;
 
@@ -170,14 +176,14 @@ public class Quiz3 extends Fragment {
         graphViews[graphIndex].setClickable(false);
 
         // Mark the function as matched
-        isFunctionMatched[selectedFunctionIndex] = true;
+        //isFunctionMatched[selectedFunctionIndex] = true;
     }
 
 
     private void resetFunctionSelections() {
         for (int i = 0; i < functionViews.length; i++) {
             // Only reset the background color if the function has not been matched
-            if (!isFunctionMatched[i]) {
+            if (!matchAttempted[i]) {
                 functionViews[i].setBackgroundColor(Color.TRANSPARENT);
             }
         }

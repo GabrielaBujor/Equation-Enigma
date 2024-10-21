@@ -54,6 +54,7 @@ public class UserProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
 
         Toolbar toolbar = view.findViewById(R.id.my_toolbar);
@@ -62,6 +63,7 @@ public class UserProfileFragment extends Fragment {
             activity.setSupportActionBar(toolbar);
         }
 
+        // Initialize UI components
         textFullName = view.findViewById(R.id.text_full_name);
         textEmail = view.findViewById(R.id.text_email);
         textUserType = view.findViewById(R.id.text_user_type);
@@ -81,25 +83,30 @@ public class UserProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Get current Firebase user
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             progressBar.setVisibility(View.VISIBLE);
             String userId = currentUser.getUid();
             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(userId);
 
+            // Fetch user data
             databaseReference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     progressBar.setVisibility(View.GONE);
                     if (dataSnapshot.exists()) {
+                        // Retrieve user data from database
                         String fullName = dataSnapshot.child("fullName").getValue(String.class);
                         String email = dataSnapshot.child("email").getValue(String.class);
                         String userType = dataSnapshot.child("userType").getValue(String.class);
 
+                        // Set user data
                         textFullName.setText(fullName != null ? fullName : "Name not available");
                         textEmail.setText(email != null ? email : "Email not available");
                         textUserType.setText(userType != null ? userType : "User type not available");
 
+                        // Load profile picture using Picasso
                         String profileImageUrl = dataSnapshot.child("profileImageUrl").getValue(String.class);
                         if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
                             Picasso.get().load(profileImageUrl).into(profilePicture);
@@ -130,6 +137,7 @@ public class UserProfileFragment extends Fragment {
         buttonLogout.setOnClickListener(v -> logout());
     }
 
+    // Handle logout
     private void logout() {
         clearUserSession();
         Intent intent = new Intent(getActivity(), LogInActivity.class);
@@ -159,6 +167,7 @@ public class UserProfileFragment extends Fragment {
         }
     }
 
+    // Update UI after profile update
     private void updateUIAfterProfileUpdate(String updatedName, String updatedImageUrl) {
         TextView userNameTextView = getView().findViewById(R.id.text_full_name);
         userNameTextView.setText(updatedName);
