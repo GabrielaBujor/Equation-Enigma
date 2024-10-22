@@ -13,6 +13,6 @@ Equation Enigma is an Android application designed to help high school students 
 - **GeoGebra**: Used for generating the graphical representation of functions, integrated into the application.
 
 **Future Improvements**
-Add more functions and equations to cover a wider range of mathematical topics.
-Implement badges and rewards to increase student engagement.
-Expand the quiz functionality with more challenging problems and additional assessment methods.
+- Add more functions and equations to cover a wider range of mathematical topics.
+- Implement badges and rewards to increase student engagement.
+- Expand the quiz functionality with more challenging problems and additional assessment methods.
