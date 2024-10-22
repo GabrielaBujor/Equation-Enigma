@@ -8,9 +8,9 @@ Equation Enigma is an Android application designed to help high school students 
 5) **Firebase Integration**: User data, lessons, quizzes, and reports are stored and managed securely using Google Firebase.
 
 **Technologies Used**
-1) **Android Studio**: The application is built using Android Studio with Java as the primary language.
-2) **Google Firebase**: Firebase Authentication for secure user login, Firestore for storing user data and educational content, and Firebase Storage for managing profile pictures and graphs.
-3) **GeoGebra**: Used for generating the graphical representation of functions, integrated into the application.
+- **Android Studio**: The application is built using Android Studio with Java as the primary language.
+- **Google Firebase**: Firebase Authentication for secure user login, Firestore for storing user data and educational content, and Firebase Storage for managing profile pictures and graphs.
+- **GeoGebra**: Used for generating the graphical representation of functions, integrated into the application.
 
 **Future Improvements**
 Add more functions and equations to cover a wider range of mathematical topics.
